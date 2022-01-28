@@ -1,4 +1,5 @@
 import Button from "../Button.mjs";
+import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
 
 export default class StartScene {
@@ -53,23 +54,17 @@ export default class StartScene {
     this.t0 = this.t0 ?? t;
     this.dt = (t - this.t0) / 1000;
     this.expire += this.expire > 0 ? -1 * this.dt : 0;
-    this.ctx.fillStyle = "hsl(200, 7%, 84%)";
+    this.ctx.fillStyle = BACKGROUND_COLOR;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.strokeStyle = "hsl(200, 7%, 74%)";
+    this.ctx.strokeStyle = FRONT_COLOR;
     this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.drawImage(
-      this.assets.img("menuBg"),
-      0,
-      0,
-      this.canvas.width,
-      this.canvas.height
-    );
+    
 
-    this.ctx.fillStyle = "black";
     if (this.assets.progresso() < 100 || this.expire > 0) {
       let fontSize = 0.03571428571428571 * this.canvas.height;
-      this.ctx.font = `${fontSize}px 'Skranji'`;
+      this.ctx.font = `${fontSize}px 'Orbitron'`;
       this.ctx.textAlign = "center";
+      this.ctx.fillStyle = FRONT_COLOR;
       this.ctx.fillText(
         `Loading... ${this.assets.progresso()}%`,
         0.5 * this.canvas.width,
@@ -94,21 +89,24 @@ export default class StartScene {
       0.7 * this.canvas.height,
       0.3 * this.canvas.width,
       0.07 * this.canvas.height,
-      "New Game"
+      "New Game",
+      false
     );
     this.rules = new Button(
       0.5 * this.canvas.width,
       0.8 * this.canvas.height,
       0.3 * this.canvas.width,
       0.07 * this.canvas.height,
-      "How to Play"
+      "How to Play",
+      false
     );
     this.credits = new Button(
       0.5 * this.canvas.width,
       0.9 * this.canvas.height,
       0.3 * this.canvas.width,
       0.07 * this.canvas.height,
-      "Credits"
+      "Credits",
+      false
     );
   }
 

@@ -1,4 +1,5 @@
 import Button from "../Button.mjs";
+import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
 
 export default class EndScene {
@@ -54,32 +55,23 @@ export default class EndScene {
   step(t) {
     this.t0 = this.t0 ?? t;
     this.dt = (t - this.t0) / 1000;
-    this.ctx.fillStyle = "hsl(200, 7%, 84%)";
+    this.ctx.fillStyle = BACKGROUND_COLOR;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.strokeStyle = "hsl(200, 7%, 74%)";
+    this.ctx.strokeStyle = FRONT_COLOR;
     this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.drawImage(
-      this.assets.img("menuBg"),
-      0,
-      0,
-      this.canvas.width,
-      this.canvas.height
-    );
-    this.mainMenu.draw(this.ctx);
-    this.ctx.fillStyle = "black";
+
+    this.ctx.fillStyle = FRONT_COLOR;
     let fontSize = 0.075 * this.canvas.height;
-    this.ctx.font = `${fontSize}px 'Skranji'`;
+    this.ctx.font = `${fontSize}px 'Orbitron'`;
     this.ctx.textAlign = "center";
     this.ctx.fillText(`Credits`, this.canvas.width/2, 0.4*this.canvas.height);
 
     fontSize = 0.02271428571428571 * this.canvas.height;
-    this.ctx.font = `${fontSize}px 'Skranji'`;
-    this.ctx.fillText(`Lincoln Castro (Game Design/Music)`, 0.5*this.canvas.width, 0.5*this.canvas.height);
+    this.ctx.font = `${fontSize}px 'Orbitron'`;
     this.ctx.fillText(`Igor Knop (Game Design/Programming)`, 0.5*this.canvas.width, 0.55*this.canvas.height);
-    this.ctx.fillText(`Caio Vincenzo (Programming)`, 0.5*this.canvas.width, 0.60*this.canvas.height);
-    this.ctx.fillText(`Igor Patrick (Artist)`, 0.5*this.canvas.width, 0.65*this.canvas.height);
-    this.ctx.fillText(`Aaron Ramires (Programming)`, 0.5*this.canvas.width, 0.7*this.canvas.height);
-    this.ctx.fillText(`Luís A. Cavalheiro (Game Design/Programming)`, 0.5*this.canvas.width, 0.75*this.canvas.height);
+    this.ctx.fillText(`Codebase of Forgothen Gods of GGJ21`, 0.5*this.canvas.width, 0.75*this.canvas.height);
+
+    this.mainMenu.draw(this.ctx);
 
     requestAnimationFrame((t) => {
       this.step(t);
@@ -93,7 +85,8 @@ export default class EndScene {
       0.85 * this.canvas.height,
       0.25 * this.canvas.width,
       0.05357142857142857 * this.canvas.height,
-      "Main Menu"
+      "Main Menu",
+      false
     );
   }
 
