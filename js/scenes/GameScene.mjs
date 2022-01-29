@@ -5,7 +5,8 @@ import Card from "../Card.mjs";
 import CrawlerCard from "../CrawlerCard.mjs";
 import { ALL_AVAILABLE } from "../../data/AllCards.mjs";
 import { GAME_TIME } from "../../data/AllTimeConstants.mjs";
-import { CARDS_GIANT_RAT } from "../../data/CardsGiantRat.mjs";
+import { CARDS_GIANT_RAT } from "../../data/cards/CardsGiantRat.mjs";
+import { CARDS_SLIME } from "../../data/cards/CardsSlime.mjs";
 import PlayArea from "../areas/PlayArea.mjs";
 import Ready from "../areas/Ready.mjs";
 import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
@@ -187,7 +188,7 @@ export default class GameScene {
 
       }
     );
-    this.areas.deck.loadAll(ALL_AVAILABLE.map((c) => new CrawlerCard(c)));
+    this.areas.deck.loadAll(CARDS_SLIME.map((c) => new CrawlerCard(c)));
     this.endTurn();
     this.areas.enemies = [
       new EnemyArea(

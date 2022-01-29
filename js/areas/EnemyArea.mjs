@@ -14,7 +14,7 @@ export default class EnemyArea extends PlayArea {
         x = 0,
         y = 0,
         draggable = true,
-        max = 5,
+        max = 2,
         gap = 2,
         cards = [],
         enemy = [],
@@ -43,10 +43,6 @@ export default class EnemyArea extends PlayArea {
             card.y = this.y + card.h / 2;
             card.draw(ctx);
         });
-        for (let h = 0; h < this.damage; h++) {
-            ctx.fillStyle = BACKGROUND_COLOR;
-            ctx.fillRect(this.x  + h * 6 - this.w, this.y - this.w/2 , 4, 4);
-        }
     }
     add(card) {
         card.flipped = false;
