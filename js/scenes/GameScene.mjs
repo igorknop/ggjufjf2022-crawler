@@ -198,7 +198,7 @@ export default class GameScene {
         w: this.canvas.width / 3,
         h: this.canvas.height / 3,
         type: 0,
-        enemy: CARDS_GIANT_RAT.map(c => new CrawlerCard(c)),
+        enemy: CARDS_SLIME.map(c => new CrawlerCard(c)),
       }),
       new EnemyArea(
         {
