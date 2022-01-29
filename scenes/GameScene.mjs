@@ -1,6 +1,7 @@
 import Area from "../Area.mjs";
 import Button from "../Button.mjs";
 import Card from "../Card.mjs";
+import CrawlerCard from "../CrawlerCard.mjs";
 import { ALL_AVAILABLE } from "../data/AllCards.mjs";
 import { GAME_TIME } from "../data/AllTimeConstants.mjs";
 import PlayArea from "../PlayArea.mjs";
@@ -9,9 +10,9 @@ import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
 
 export default class GameScene {
-  constructor(canvas) {
+  constructor(canvas, ctx) {
     this.canvas = canvas;
-    this.ctx = this.canvas.getContext("2d");
+    this.ctx = ctx;
     this.grace = 5;
     this.reputation = 5;
     this.playedCard = null;
@@ -33,11 +34,12 @@ export default class GameScene {
     const totalBuildReputations =
       4 * this.areas.buildings.reduce((a, c) => a + c.reputation - 2, 0);
     this.game.messages.push(
-      `Building's Reputation:\t\t${totalBuildReputations}`
+      `Character Skills:\t\t${totalBuildReputations}`
     );
     const totalGodReputations =
       8 * this.areas.enemies.reduce((a, c) => a + c.reputation - 2, 0);
-    this.game.messages.push(`God's Grace:\t\t${totalGodReputations}`);
+    this.game.messages.push(`Character Level:\t\t${totalGodReputations}`);
+    this.game.messages.push(`Monsters Slain:\t\t${totalGodReputations}`);
     let total = 0;
     total += totalBuildReputations;
     total += totalGodReputations;
@@ -88,13 +90,6 @@ export default class GameScene {
     this.canvas.ontouchmove = (e) => {
       this.touchmove(e);
     };
-
-
-
-    //this.areas.enemies[0].loadAll(ALL_GOD_A_CARDS, this.canvas);
-    //this.areas.enemies[0].godMode = "A";
-    //this.areas.enemies[1].loadAll(ALL_GOD_B_CARDS, this.canvas);
-    //this.areas.enemies[1].godMode = "B";
 
   }
 
@@ -190,20 +185,8 @@ export default class GameScene {
 
       }
     );
-    //this.areas.deck.loadAll(ALL_AVAILABLE, this.canvas);
-    this.areas.deck.add(new Card({ text: "Card00" }));
-    this.areas.deck.add(new Card({ text: "Card01" }));
-    this.areas.deck.add(new Card({ text: "Card02" }));
-    this.areas.deck.add(new Card({ text: "Card03" }));
-    this.areas.deck.add(new Card({ text: "Card04" }));
-    this.areas.deck.add(new Card({ text: "Card05" }));
-    this.areas.deck.add(new Card({ text: "Card06" }));
-    this.areas.deck.add(new Card({ text: "Card07" }));
-    this.areas.deck.add(new Card({ text: "Card08" }));
+    this.areas.deck.loadAll(ALL_AVAILABLE.map((c) => new CrawlerCard(c)));
     this.endTurn();
-    this.areas.discard.add(new Card({ text: "Card08" }));
-    this.areas.trash.add(new Card({ text: "Card08" }));
-    this.areas.discard.add(new Card({ text: "Card08" }));
     this.areas.enemies = [];
     this.areas.enemies.push(
       new PlayArea(

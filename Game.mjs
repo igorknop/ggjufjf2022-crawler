@@ -38,11 +38,14 @@ export default class Game {
     this.assets = assets;
     this.scenes = new Map();
     this.messages = [];
-    this.addScene("game", new GameScene(canvas));
-    this.addScene("end", new EndScene(canvas));
-    this.addScene("start", new StartScene(canvas));
-    this.addScene("credits", new CreditsScene(canvas));
-    this.addScene("rules", new RulesScene(canvas));
+    this.canvas = canvas;
+    this.ctx = canvas.getContext("2d");
+    setpixelated(this.ctx);
+    this.addScene("game", new GameScene(this.canvas, this.ctx));
+    this.addScene("end", new EndScene(this.canvas, this.ctx));
+    this.addScene("start", new StartScene(this.canvas, this.ctx));
+    this.addScene("credits", new CreditsScene(this.canvas, this.ctx));
+    this.addScene("rules", new RulesScene(this.canvas, this.ctx));
     this.setScene("start");
     const r = 0.115;
     const w = canvas.height * r * 0.75;
@@ -68,4 +71,12 @@ export default class Game {
   start() {
     this.scene.start();
   }
+}
+
+function setpixelated(context){
+  context['imageSmoothingEnabled'] = false;       /* standard */
+  context['mozImageSmoothingEnabled'] = false;    /* Firefox */
+  context['oImageSmoothingEnabled'] = false;      /* Opera */
+  context['webkitImageSmoothingEnabled'] = false; /* Safari */
+  context['msImageSmoothingEnabled'] = false;     /* IE */
 }

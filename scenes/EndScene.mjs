@@ -3,9 +3,9 @@ import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
 
 export default class EndScene {
-  constructor(canvas) {
+  constructor(canvas, ctx) {
     this.canvas = canvas;
-    this.ctx = this.canvas.getContext("2d");
+    this.ctx = ctx;
     this.expire = 2;
     this.grace = 5;
     this.reputation = 5;
