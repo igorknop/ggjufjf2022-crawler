@@ -11,6 +11,7 @@ import PlayArea from "../areas/PlayArea.mjs";
 import Ready from "../areas/Ready.mjs";
 import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
+import { shuffleArray } from "../util/shuffle.mjs";
 
 export default class GameScene {
   constructor(canvas, ctx) {
@@ -141,9 +142,9 @@ export default class GameScene {
       0.05 * this.canvas.height
     );
     this.drawHud(this.ctx);
-    if (this.areas.hand.cards.length === 0) {
-      this.endTurn();
-    }
+    // if (this.areas.hand.cards.length === 0) {
+    //   this.endTurn();
+    // }
     if (this.expire <= 0) {
       //cancelAnimationFrame(this.animID);
       this.game.setScene("end");
@@ -195,18 +196,18 @@ export default class GameScene {
 
       }
     );
+
     this.areas.deck.loadAll(CARDS_SLIME.map((c) => new CrawlerCard(c)));
-    this.endTurn();
     this.areas.enemies = [
       new EnemyArea(
-      {
-        x: 0.5 * this.canvas.width / 3,
-        y: 0.25 * this.canvas.height,
-        w: this.canvas.width / 3,
-        h: this.canvas.height / 3,
-        type: 0,
-        enemy: CARDS_SLIME.map(c => new CrawlerCard(c)),
-      }),
+        {
+          x: 0.5 * this.canvas.width / 3,
+          y: 0.25 * this.canvas.height,
+          w: this.canvas.width / 3,
+          h: this.canvas.height / 3,
+          type: 0,
+          enemy: shuffleArray(CARDS_SLIME.map(c => new CrawlerCard(c))),
+        }),
       new EnemyArea(
         {
           x: 1.5 * this.canvas.width / 3,
@@ -214,7 +215,7 @@ export default class GameScene {
           w: this.canvas.width / 3,
           h: this.canvas.height / 3,
           type: 0,
-          enemy: CARDS_GIANT_RAT.map(c => new CrawlerCard(c)),
+          enemy: shuffleArray(CARDS_SLIME.map(c => new CrawlerCard(c))),
         }
       ),
       new EnemyArea(
@@ -224,7 +225,7 @@ export default class GameScene {
           w: this.canvas.width / 3,
           h: this.canvas.height / 3,
           type: 0,
-          enemy: CARDS_GIANT_RAT.map(c => new CrawlerCard(c)),
+          enemy: shuffleArray(CARDS_SLIME.map(c => new CrawlerCard(c))),
         }),
     ];
 
@@ -261,6 +262,8 @@ export default class GameScene {
       "Trash",
       false
     );
+    //this.endTurn(this);
+    this.refillPlayerHand();
   }
 
   mousedown(e) {
@@ -359,9 +362,17 @@ export default class GameScene {
     const newTouch = e.changedTouches[0];
     this.mousemove(newTouch);
   }
-  endTurn() {
-    this.areas.discard.addAll(this.areas.hand);
 
+  endTurn() {
+    this.areas.enemies.forEach((enemyArea) => {
+      enemyArea.resolveEffects(this);
+    });
+
+    //this.areas.discard.addAll(this.areas.hand);
+
+  }
+
+  refillPlayerHand(){
     if (this.areas.deck.size() <= 5) {
       this.areas.hand.addAll(this.areas.deck);
       this.areas.deck.addAll(this.areas.discard);
@@ -374,17 +385,17 @@ export default class GameScene {
     }
   }
 
-  drawHud(ctx){
+  drawHud(ctx) {
     for (let h = 0; h < this.player.hitPoints; h++) {
-        ctx.fillStyle = FRONT_COLOR;
-        ctx.fillRect(this.canvas.width*0.10+ h * 12, this.canvas.height*0.64, 10, 10);
+      ctx.fillStyle = FRONT_COLOR;
+      ctx.fillRect(this.canvas.width * 0.10 + h * 12, this.canvas.height * 0.64, 10, 10);
     }
     for (let h = 0; h < this.player.damage; h++) {
-        ctx.fillStyle = FRONT_COLOR;
-        ctx.beginPath();
-        ctx.ellipse(this.canvas.width*0.9 - h * 12 , this.canvas.height*0.647, 5, 5, 0, Math.PI * 2, false);
-        ctx.fill();
-        ctx.closePath();
+      ctx.fillStyle = FRONT_COLOR;
+      ctx.beginPath();
+      ctx.ellipse(this.canvas.width * 0.9 - h * 12, this.canvas.height * 0.647, 5, 5, 0, Math.PI * 2, false);
+      ctx.fill();
+      ctx.closePath();
     }
 
   }

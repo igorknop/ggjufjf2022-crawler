@@ -14,18 +14,22 @@ const PEOPLE_IMAGES = [
 ];
 
 export default class CrawlerCard extends Card {
-    constructor({ w = CARD_W, h = CARD_H, text = "Card ?", player, enemy, flipped }) {
+    constructor({ w = CARD_W, h = CARD_H, text = "Card ?", player, enemy, flipped , damage=0, hitPoints=0}) {
         super({
             w, h, text,
         });
-        this.player = player ?? {
+        this.player = {
             name: "Player Face",
+            effects:[],
+            ...player,
         };
-        this.enemy = enemy ?? {
+        this.enemy = {
             name: "Enemy Face",
-            hitPoints: 0,
-            damage: 2,
-        }
+            hitPoints: hitPoints,
+            damage: 0,
+            effects:[],
+            ...enemy,
+        };
         this.flipped = flipped ?? false;
     }
     draw(ctx) {
@@ -36,13 +40,14 @@ export default class CrawlerCard extends Card {
         }
     }
     drawAsPlayer(ctx) {
-        ctx.beginPath();
+
         ctx.fillStyle = BACKGROUND_COLOR;
         ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
         ctx.lineWidth = 2;
         ctx.strokeStyle = FRONT_COLOR;
         ctx.fillStyle = FRONT_COLOR;
         ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+        ctx.textAlign = "center";
         ctx.font = '12px "Orbitron"';
         ctx.fillText(this.player.name, this.x, this.y - this.w * 0.46, this.w * 0.9);
         ctx.fillStyle = FRONT_COLOR;
@@ -60,6 +65,7 @@ export default class CrawlerCard extends Card {
         ctx.strokeStyle = BACKGROUND_COLOR;
         ctx.fillStyle = BACKGROUND_COLOR;
         ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+        ctx.textAlign = "center";
         ctx.font = '12px "Orbitron"';
         ctx.fillText(this.enemy.name, this.x, this.y - this.h * 0.30, this.w * 0.9);
         for (let h = 0; h < this.enemy.hitPoints; h++) {

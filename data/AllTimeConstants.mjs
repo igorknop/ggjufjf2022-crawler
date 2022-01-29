@@ -25,3 +25,6 @@ TYPE_COLOR[SENATOR] = "red";
 TYPE_COLOR[SOLDIER] = "blue";
 
 
+export const EFFECT_ATTACK = 'attack';
+export const EFFECT_DEFENSE = 'defense';
+export const EFFECT_REGENERATION = 'regeneration';
