@@ -16,3 +16,7 @@ A micro dungeon crawl - deck building game
 ##Artwork:
     1bit Icons (CC-By-ND 4.0) from 
     https://vectorpixelstar.itch.io/1-bit-16px-icons-part-1
+
+##License
+    Creative Commons Attribution-Share Alike 4.0 International License
+    CC-BY-SA 4.0 International License
