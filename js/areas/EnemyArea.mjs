@@ -1,5 +1,5 @@
 import PlayArea from "./PlayArea.mjs";
-import { TYPE_COLOR, FAST, CARD_H } from "../../data/AllTimeConstants.mjs";
+import { TYPE_COLOR, FAST, CARD_H, EFFECT_ATTACK, EFFECT_DEFENSE, EFFECT_REGENERATION } from "../../data/AllTimeConstants.mjs";
 import { assets } from "../Game.mjs";
 import Sprite from "../Sprite.mjs";
 import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
@@ -24,15 +24,14 @@ export default class EnemyArea extends PlayArea {
         this.effect = effect;
         this.enemy = enemy;
         this.updatePositions();
-        this.hitPoints = this.enemy.length > 0 ? this.enemy[0].enemy.hitPoints : 0;
-        this.damage = 0;
     }
 
     draw(ctx) {
+        let fontSize = 0.025 * ctx.canvas.width;
+        ctx.font = `${fontSize}px 'Orbitron'`;
         ctx.strokeStyle = FRONT_COLOR;
-        ctx.lineWidth = 3;
-        ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
         ctx.lineWidth = 1;
+        ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
 
         if (this.enemy.length > 0) {
             this.enemy[0].draw(ctx);
@@ -75,5 +74,51 @@ export default class EnemyArea extends PlayArea {
             card.x = this.x - (this.w - this.cards.length - 1) / 2 * k + card.w / 2;
             card.y = this.y + card.h / 2;
         });
+    }
+
+    resolveEffects(game) {
+        let enemyTotalDamage = 0;
+        let enemyTotalDefense = 0;
+        let enemyTotalRegeneration = 0;
+
+        let playerTotalDamage = 0;
+        let playerTotalDefense = 0;
+        let playerTotalRegeneration = 0;
+
+        this.cards.forEach(card => {
+            card.player.effects.forEach(effect => {
+                if (effect.type === EFFECT_ATTACK) {
+                    playerTotalDamage += effect.value;
+                } else if (effect.type === EFFECT_DEFENSE) {
+                    playerTotalDefense += effect.value;
+                } else if (effect.type === EFFECT_REGENERATION) {
+                    playerTotalRegeneration += effect.value;
+                }
+            });
+        });
+        if (this.enemy.length > 0) {
+            this.enemy[0].enemy.effects.forEach(effect => {
+                if (effect.type === EFFECT_ATTACK) {
+                    enemyTotalDamage += effect.value;
+                } else if (effect.type === EFFECT_DEFENSE) {
+                    enemyTotalDefense += effect.value;
+                } else if (effect.type === EFFECT_REGENERATION) {
+                    enemyTotalRegeneration += effect.value;
+                }
+            });
+            this.enemy[0].enemy.damage += Math.max(playerTotalDamage - enemyTotalDefense, 0);
+            game.player.stats.damageDealt += Math.min(playerTotalDamage - enemyTotalDefense, 0);
+            if (this.enemy[0].enemy.damage >= this.enemy[0].enemy.hitPoints) {
+                game.player.stats.enemiesKilled++;
+                this.enemy[0].enemy.damage = 0;
+                this.enemy[0].flipped = false;
+                game.areas.loot.add(this.enemy.shift());
+                return;
+            }
+            this.enemy[0].enemy.damage = Math.max(this.enemy[0].enemy.damage - enemyTotalRegeneration, 0);
+        }
+        game.player.stats.damageBlocked += Math.min(playerTotalDefense, enemyTotalDamage);
+        game.player.damage += Math.max(enemyTotalDamage - playerTotalDefense, 0);
+        game.player.damage = Math.max(game.player.damage - playerTotalRegeneration, 0);
     }
 }

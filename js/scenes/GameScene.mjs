@@ -4,24 +4,20 @@ import Button from "../Button.mjs";
 import Card from "../Card.mjs";
 import CrawlerCard from "../CrawlerCard.mjs";
 import { ALL_AVAILABLE } from "../../data/AllCards.mjs";
-import { GAME_TIME } from "../../data/AllTimeConstants.mjs";
+import { CARDS_IN_HAND, GAME_TIME } from "../../data/AllTimeConstants.mjs";
 import { CARDS_GIANT_RAT } from "../../data/cards/CardsGiantRat.mjs";
 import { CARDS_SLIME } from "../../data/cards/CardsSlime.mjs";
 import PlayArea from "../areas/PlayArea.mjs";
 import Ready from "../areas/Ready.mjs";
 import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
+import { shuffleArray } from "../util/shuffle.mjs";
 
 export default class GameScene {
   constructor(canvas, ctx) {
     this.canvas = canvas;
     this.ctx = ctx;
-    this.player = {
-      hitPoints: 5,
-      damage: 0,
-      monstersKilled: 0,
-      coins: 0,
-    }
+    this.player = createPlayerData();
     this.grace = 5;
     this.reputation = 5;
     this.playedCard = null;
@@ -47,8 +43,13 @@ export default class GameScene {
     );
     const totalGodReputations =
       8 * this.areas.enemies.reduce((a, c) => a + c.reputation - 2, 0);
-    this.game.messages.push(`Character Level:\t\t${totalGodReputations}`);
-    this.game.messages.push(`Monsters Slain:\t\t${totalGodReputations}`);
+    for (const key in this.player.stats) {
+      if (Object.hasOwnProperty.call(this.player.stats, key)) {
+        const value = this.player.stats[key];
+        this.game.messages.push(`${key}: ${value}`);
+
+      }
+    }
     let total = 0;
     total += totalBuildReputations;
     total += totalGodReputations;
@@ -65,13 +66,14 @@ export default class GameScene {
 
   setup() {
     this.expire = GAME_TIME;
-    this.grace = 5;
-    this.reputation = 5;
     this.playedCard = null;
     this.t0 = null;
     this.dt = null;
     this.areas = {};
     const touches = [];
+    this.player = createPlayerData();
+    this.loot = [];
+
     this.createAreas();
     this.animID = null;
 
@@ -111,51 +113,56 @@ export default class GameScene {
     this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
 
     //this.areas.cardCount.draw(this.ctx);
+    const fontSize = 0.025 * this.ctx.canvas.width;
+    this.ctx.font = `${fontSize}px "Orbitron"`;
     this.areas.enemies.forEach((e) => {
       e.draw(this.ctx);
     });
 
 
-    this.areas.hand.draw(this.ctx);
     this.areas.trash.draw(this.ctx);
     this.areas.deck.draw(this.ctx);
     this.areas.discard.draw(this.ctx);
-
+    this.areas.loot.draw(this.ctx);
+    
     this.newTurn.draw(this.ctx);
     this.showDiscard.draw(this.ctx);
     this.showDeck.draw(this.ctx);
     this.showTrash.draw(this.ctx);
-
+    
     this.expire -= Math.min(this.expire, 1 * this.dt);
     const min = padzero(Math.floor(this.expire / 60), 2);
     const seg = padzero(Math.floor(this.expire % 60), 2);
     this.ctx.font = `${this.canvas.height * 0.05}px 'Orbitron'`;
     this.ctx.textAlign = "center";
     this.ctx.fillStyle =
-      this.expire > 30
-        ? FRONT_COLOR
-        : `hsl(0deg, 100%, ${(1 - this.expire / 30) * 50}%`;
+    this.expire > 38
+    ? FRONT_COLOR
+    : `hsl(0deg, ${(2 - this.expire / 38) * 50}%,  ${(2 - this.expire / 38) * 50}%)`;
     this.ctx.fillText(
       `${min}:${seg}`,
       0.5 * this.canvas.width,
       0.05 * this.canvas.height
-    );
-    this.drawHud(this.ctx);
-    if (this.areas.hand.cards.length === 0) {
-      this.endTurn();
-    }
-    if (this.expire <= 0) {
-      //cancelAnimationFrame(this.animID);
-      this.game.setScene("end");
-      return;
-    }
-    this.animID = requestAnimationFrame((t) => {
-      this.step(t);
-    });
-    this.t0 = t;
-  }
-
-  createAreas() {
+      );
+      this.drawHud(this.ctx);
+      this.areas.hand.draw(this.ctx);
+      this.playedCard?.draw(this.ctx);
+      // if (this.areas.hand.cards.length === 0) {
+        //   this.endTurn();
+        // }
+        if (this.expire <= 0 || (this.player.damage >= this.player.hitPoints)) {
+          //cancelAnimationFrame(this.animID);
+          
+          this.game.setScene("end");
+          return;
+        }
+        this.animID = requestAnimationFrame((t) => {
+          this.step(t);
+        });
+        this.t0 = t;
+      }
+      
+      createAreas() {
 
     this.areas.hand = new Ready(
       {
@@ -192,21 +199,30 @@ export default class GameScene {
         y: 0.9153571428571429 * this.canvas.height,
         visible: false,
         w: this.canvas.width * (4 / 5),
-
       }
     );
+
+    this.areas.loot = new Area(
+      {
+        title: "Loot",
+        x: this.canvas.width / 2,
+        y: 0.55 * this.canvas.height,
+        visible: true,
+        w: this.canvas.width * (4 / 5),
+      }
+    );
+
     this.areas.deck.loadAll(CARDS_SLIME.map((c) => new CrawlerCard(c)));
-    this.endTurn();
     this.areas.enemies = [
       new EnemyArea(
-      {
-        x: 0.5 * this.canvas.width / 3,
-        y: 0.25 * this.canvas.height,
-        w: this.canvas.width / 3,
-        h: this.canvas.height / 3,
-        type: 0,
-        enemy: CARDS_SLIME.map(c => new CrawlerCard(c)),
-      }),
+        {
+          x: 0.5 * this.canvas.width / 3,
+          y: 0.25 * this.canvas.height,
+          w: this.canvas.width / 3,
+          h: this.canvas.height / 3,
+          type: 0,
+          enemy: shuffleArray(CARDS_SLIME.map(c => new CrawlerCard(c))),
+        }),
       new EnemyArea(
         {
           x: 1.5 * this.canvas.width / 3,
@@ -214,7 +230,7 @@ export default class GameScene {
           w: this.canvas.width / 3,
           h: this.canvas.height / 3,
           type: 0,
-          enemy: CARDS_GIANT_RAT.map(c => new CrawlerCard(c)),
+          enemy: shuffleArray(CARDS_SLIME.map(c => new CrawlerCard(c))),
         }
       ),
       new EnemyArea(
@@ -224,43 +240,45 @@ export default class GameScene {
           w: this.canvas.width / 3,
           h: this.canvas.height / 3,
           type: 0,
-          enemy: CARDS_GIANT_RAT.map(c => new CrawlerCard(c)),
+          enemy: shuffleArray(CARDS_SLIME.map(c => new CrawlerCard(c))),
         }),
     ];
 
     this.areas.buildings = [];
     this.newTurn = new Button(
-      0.85 * this.canvas.width,
-      0.58 * this.canvas.height,
-      0.25625 * this.canvas.width,
-      0.07 * this.canvas.height,
+      this.canvas.width * (0 + 4 / 4 - 1 / 8),
+      0.83 * this.canvas.height,
+      0.21875 * this.canvas.width,
+      0.045 * this.canvas.height,
       "End Turn",
       false
     );
     this.showDeck = new Button(
-      this.canvas.width * (0 + 1 / 3 - 1 / 5),
-      0.82 * this.canvas.height,
+      this.canvas.width * (0 + 2 / 4 - 1 / 8),
+      0.83 * this.canvas.height,
       0.21875 * this.canvas.width,
-      0.043 * this.canvas.height,
+      0.045 * this.canvas.height,
       "Deck",
       false
     );
     this.showDiscard = new Button(
-      this.canvas.width * (2 / 3 - 1 / 5),
-      0.82 * this.canvas.height,
+      this.canvas.width * (3 / 4 - 1 / 8),
+      0.83 * this.canvas.height,
       0.21875 * this.canvas.width,
       0.045 * this.canvas.height,
       "Discard",
       false
     );
     this.showTrash = new Button(
-      this.canvas.width * (3 / 3 - 1 / 5),
-      0.82 * this.canvas.height,
+      this.canvas.width * (1 / 4 - 1 / 8),
+      0.83 * this.canvas.height,
       0.21875 * this.canvas.width,
       0.045 * this.canvas.height,
       "Trash",
       false
     );
+    //this.endTurn(this);
+    this.refillPlayerHand();
   }
 
   mousedown(e) {
@@ -330,6 +348,22 @@ export default class GameScene {
       this.areas.discard.visible = false;
       this.areas.trash.visible = !this.areas.trash.visible;
     }
+
+    this.areas.loot.cards.forEach((lootedCard) => {
+      // const checked = enemy.check(x, y);
+      if (lootedCard.hasPoint({ x, y })) {
+        this.areas.loot.delete(lootedCard)
+        this.areas.discard.add(lootedCard);
+        this.player.stats.lootedCards++;
+
+        this.player.coins += this.areas.loot.size();
+        this.player.stats.coinsGained += this.areas.loot.size();
+
+        this.areas.trash.addAll(this.areas.loot);
+
+      }
+    });
+
   }
   mousemove(e) {
     const [x, y] = getXY(e, this.canvas);
@@ -359,14 +393,27 @@ export default class GameScene {
     const newTouch = e.changedTouches[0];
     this.mousemove(newTouch);
   }
-  endTurn() {
-    this.areas.discard.addAll(this.areas.hand);
 
-    if (this.areas.deck.size() <= 5) {
+  endTurn() {
+    this.areas.enemies.forEach((enemyArea) => {
+      enemyArea.resolveEffects(this);
+    });
+    this.areas.discard.addAll(this.areas.hand);
+    this.areas.enemies.forEach((enemyArea) => {
+      this.areas.discard.cards = [...this.areas.discard.cards, ...enemyArea.cards];
+      enemyArea.cards = [];
+    });
+    this.areas.discard.updatePositions();
+    this.refillPlayerHand();
+
+  }
+
+  refillPlayerHand() {
+    if (this.areas.deck.size() <= CARDS_IN_HAND) {
       this.areas.hand.addAll(this.areas.deck);
       this.areas.deck.addAll(this.areas.discard);
     }
-    while (this.areas.hand.size() < 5 && this.areas.deck.size() > 0) {
+    while (this.areas.hand.size() < CARDS_IN_HAND && this.areas.deck.size() > 0) {
       const r = Math.floor(Math.random() * this.areas.deck.size());
       const p = this.areas.deck.cards[r];
       this.areas.hand.add(p);
@@ -374,17 +421,17 @@ export default class GameScene {
     }
   }
 
-  drawHud(ctx){
+  drawHud(ctx) {
     for (let h = 0; h < this.player.hitPoints; h++) {
-        ctx.fillStyle = FRONT_COLOR;
-        ctx.fillRect(this.canvas.width*0.10+ h * 12, this.canvas.height*0.64, 10, 10);
+      ctx.fillStyle = FRONT_COLOR;
+      ctx.fillRect(this.canvas.width * 0.10 + h * 12, this.canvas.height * 0.64, 10, 10);
     }
     for (let h = 0; h < this.player.damage; h++) {
-        ctx.fillStyle = FRONT_COLOR;
-        ctx.beginPath();
-        ctx.ellipse(this.canvas.width*0.9 - h * 12 , this.canvas.height*0.647, 5, 5, 0, Math.PI * 2, false);
-        ctx.fill();
-        ctx.closePath();
+      ctx.fillStyle = FRONT_COLOR;
+      ctx.beginPath();
+      ctx.ellipse(this.canvas.width * 0.9 - h * 12, this.canvas.height * 0.647, 5, 5, 0, Math.PI * 2, false);
+      ctx.fill();
+      ctx.closePath();
     }
 
   }
@@ -393,3 +440,21 @@ function padzero(num, places) {
   return String(num).padStart(places, "0");
 }
 
+function createPlayerData() {
+  return {
+    hitPoints: 5,
+    damage: 0,
+    coins: 0,
+
+    stats: {
+      monstersKilled: 0,
+      lootedCards: 0,
+      damageTaken: 0,
+      damageBlocked: 0,
+      damageDealt: 0,
+      level: 1,
+      coinsGained: 0,
+      coinsSpent: 0,
+    }
+  }
+}
