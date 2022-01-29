@@ -2,7 +2,7 @@ import PlayArea from "./PlayArea.mjs";
 import { TYPE_COLOR, FAST, CARD_H } from "../../data/AllTimeConstants.mjs";
 import { assets } from "../Game.mjs";
 import Sprite from "../Sprite.mjs";
-import { FRONT_COLOR } from "../util/Colors.mjs";
+import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import CrawlerCard from "../CrawlerCard.mjs";
 
 export default class EnemyArea extends PlayArea {
@@ -24,6 +24,8 @@ export default class EnemyArea extends PlayArea {
         this.effect = effect;
         this.enemy = enemy;
         this.updatePositions();
+        this.hitPoints = this.enemy.length > 0 ? this.enemy[0].enemy.hitPoints : 0;
+        this.damage = 0;
     }
 
     draw(ctx) {
@@ -34,12 +36,17 @@ export default class EnemyArea extends PlayArea {
 
         if (this.enemy.length > 0) {
             this.enemy[0].draw(ctx);
+            //this.hitPoints = this.enemy[0].hitPoints;
         }
         this.cards.forEach((card, k) => {
-            card.x = this.x -(this.w-this.cards.length-1)/2 * k + card.w/2;
-            card.y = this.y + card.h/2;
+            card.x = this.x - (this.w - this.cards.length - 1) / 2 * k + card.w / 2;
+            card.y = this.y + card.h / 2;
             card.draw(ctx);
         });
+        for (let h = 0; h < this.damage; h++) {
+            ctx.fillStyle = BACKGROUND_COLOR;
+            ctx.fillRect(this.x  + h * 6 - this.w, this.y - this.w/2 , 4, 4);
+        }
     }
     add(card) {
         card.flipped = false;
@@ -55,22 +62,22 @@ export default class EnemyArea extends PlayArea {
     }
 
     loadAll(cards) {
-        cards.forEach(c=>{
+        cards.forEach(c => {
             this.addEnemy(c);
         });
         this.updatePositions();
     }
 
     updatePositions() {
-        this.enemy.forEach((card,k) => {
+        this.enemy.forEach((card, k) => {
             card.flipped = true;
             card.x = this.x;
-            card.y = this.y - card.h*0.65;
+            card.y = this.y - card.h * 0.65;
         });
-        this.cards.forEach((card,k) => {
+        this.cards.forEach((card, k) => {
             card.flipped = false;
-            card.x = this.x -(this.w-this.cards.length-1)/2 * k + card.w/2;
-            card.y = this.y + card.h/2;
+            card.x = this.x - (this.w - this.cards.length - 1) / 2 * k + card.w / 2;
+            card.y = this.y + card.h / 2;
         });
     }
 }
