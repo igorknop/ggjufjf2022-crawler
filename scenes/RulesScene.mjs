@@ -84,7 +84,7 @@ export default class RulesScene {
     // this.ctx.fillText(`the proposed locations. Send the right card to the      `, 0.5*this.canvas.width, 0.58*this.canvas.height);
     // this.ctx.fillText(`end it is added and to win you need to have a positive  `, 0.5*this.canvas.width, 0.61*this.canvas.height);
     // this.ctx.fillText(`score. When the marker for each tribe location is low,  `, 0.5*this.canvas.width, 0.64*this.canvas.height);
-    // this.ctx.fillText(`it will generate less respwan of the cards. Store the   `, 0.5*this.canvas.width, 0.67*this.canvas.height);
+    // this.ctx.fillText(`it will generate less resCARD_Wan of the cards. Store the   `, 0.5*this.canvas.width, 0.67*this.canvas.height);
     // this.ctx.fillText(`card in these places, it will remain in the reserve     `, 0.5*this.canvas.width, 0.70*this.canvas.height);
     // this.ctx.fillText(`until the next round is drawn. Any card that is brought `, 0.5*this.canvas.width, 0.73*this.canvas.height);
     // this.ctx.fillText(`to the Gods, it will be destroyed.                      `, 0.5*this.canvas.width, 0.76*this.canvas.height);   

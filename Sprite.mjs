@@ -1,16 +1,17 @@
-import { PRIEST } from "./data/AllTimeConstants.mjs";
+import { CARD_H, CARD_W, PRIEST } from "./data/AllTimeConstants.mjs";
 import { TYPE_COLOR } from "./data/AllTimeConstants.mjs";
 
 
 export default class Sprite {
-  constructor({type = PRIEST, w=48, h=64, draggable=true}) {
+  constructor({type = PRIEST, w=CARD_W, h=CARD_H, draggable=true, x=0, y=0, text=""}) {
     this.type = type;
-    this.x = 0;
-    this.y = 0;
+    this.x = x;
+    this.y = y;
     this.w = w;
     this.h = h;
     this.draggable = draggable;
     this.color = TYPE_COLOR[PRIEST];
+    this.text = text;
   }
   draw(ctx) {
     ctx.beginPath();

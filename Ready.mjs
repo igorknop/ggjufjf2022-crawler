@@ -1,9 +1,12 @@
 import Area from "./Area.mjs";
 
-export default class Ready extends Area{
+export default class Ready extends Area {
+  constructor(props) {
+    super(props);
+  }
   
-  add(people){
-      super.add(people);
-      people.draggable = true;
+  add(card){
+      super.add(card);
+      card.draggable = true;
   }
 }

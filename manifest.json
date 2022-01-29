@@ -1,0 +1,21 @@
+{
+    "name": "Crawler",
+    "short_name": "Crawler",
+    "start_url": ".",
+    "scope": ".",
+    "display": "standalone",
+    "theme_color": "hsl(260, 5%, 5%)",
+    "icons": [
+      {
+        "src": "./icon-192.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "./icon-512.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+    ]
+  }
+  

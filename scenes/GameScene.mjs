@@ -1,19 +1,11 @@
-import Ready from "../Ready.mjs";
-import Activities from "../Activities.mjs";
 import Area from "../Area.mjs";
-import { ALL_AVAILABLE } from "../data/AllCards.mjs";
-import People from "../People.mjs";
 import Button from "../Button.mjs";
-import { ALL_FARM_CARDS } from "../data/AllFarmCards.mjs";
-import { ALL_GOD_A_CARDS } from "../data/AllGodACards.mjs";
-import { ALL_GOD_B_CARDS } from "../data/AllGodBCards.mjs";
-import { FARMER, SOLDIER, SENATOR, PRIEST } from "../data/AllTimeConstants.mjs";
-import { ALL_BARRACKS_CARDS } from "../data/AllBarracksCards.mjs";
-import { ALL_SENATE_CARDS } from "../data/AllSenateCards.mjs";
-import { ALL_TEMPLE_CARDS } from "../data/AllTempleCards.mjs";
+import Card from "../Card.mjs";
+import { ALL_AVAILABLE } from "../data/AllCards.mjs";
 import { GAME_TIME } from "../data/AllTimeConstants.mjs";
-import Sacrifices from "../Sacrifices.mjs";
-import NextTurnButton from "../NextTurnButton.mjs";
+import PlayArea from "../PlayArea.mjs";
+import Ready from "../Ready.mjs";
+import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
 
 export default class GameScene {
@@ -22,7 +14,7 @@ export default class GameScene {
     this.ctx = this.canvas.getContext("2d");
     this.grace = 5;
     this.reputation = 5;
-    this.dragging = null;
+    this.playedCard = null;
     this.t0 = null;
     this.dt = null;
     this.areas = {};
@@ -32,7 +24,6 @@ export default class GameScene {
   }
   start() {
     this.assets.stopAll();
-    this.assets.play("theme", true, 0.1);
     this.animID = requestAnimationFrame((t) => {
       this.step(t);
     });
@@ -45,7 +36,7 @@ export default class GameScene {
       `Building's Reputation:\t\t${totalBuildReputations}`
     );
     const totalGodReputations =
-      8 * this.areas.gods.reduce((a, c) => a + c.reputation - 2, 0);
+      8 * this.areas.enemies.reduce((a, c) => a + c.reputation - 2, 0);
     this.game.messages.push(`God's Grace:\t\t${totalGodReputations}`);
     let total = 0;
     total += totalBuildReputations;
@@ -55,9 +46,9 @@ export default class GameScene {
     this.game.score = total;
     this.assets.stopAll();
     if (total < 0) {
-      this.assets.play("lost");
+      //this.assets.play("lost");
     } else {
-      this.assets.play("win");
+      //this.assets.play("win");
     }
   }
 
@@ -65,7 +56,7 @@ export default class GameScene {
     this.expire = GAME_TIME;
     this.grace = 5;
     this.reputation = 5;
-    this.dragging = null;
+    this.playedCard = null;
     this.t0 = null;
     this.dt = null;
     this.areas = {};
@@ -98,69 +89,54 @@ export default class GameScene {
       this.touchmove(e);
     };
 
-    this.areas.cardCount.add(new People({ type: PRIEST }));
-    this.areas.cardCount.add(new People({ type: FARMER }));
-    this.areas.cardCount.add(new People({ type: SENATOR }));
-    this.areas.cardCount.add(new People({ type: SOLDIER }));
 
-    this.areas.gods[0].loadAll(ALL_GOD_A_CARDS, this.canvas);
-    this.areas.gods[0].godMode = "A";
-    this.areas.gods[1].loadAll(ALL_GOD_B_CARDS, this.canvas);
-    this.areas.gods[1].godMode = "B";
-    this.areas.buildings[SOLDIER].loadAll(ALL_BARRACKS_CARDS, this.canvas);
-    this.areas.buildings[FARMER].loadAll(ALL_FARM_CARDS, this.canvas);
-    this.areas.buildings[SENATOR].loadAll(ALL_SENATE_CARDS, this.canvas);
-    this.areas.buildings[PRIEST].loadAll(ALL_TEMPLE_CARDS, this.canvas);
+
+    //this.areas.enemies[0].loadAll(ALL_GOD_A_CARDS, this.canvas);
+    //this.areas.enemies[0].godMode = "A";
+    //this.areas.enemies[1].loadAll(ALL_GOD_B_CARDS, this.canvas);
+    //this.areas.enemies[1].godMode = "B";
+
   }
 
   step(t) {
     this.t0 = this.t0 ?? t;
     this.dt = Math.min((t - this.t0) / 1000, 0.32);
-    this.ctx.fillStyle = "hsl(200, 7%, 84%)";
+    this.ctx.fillStyle = BACKGROUND_COLOR;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.strokeStyle = "hsl(200, 7%, 74%)";
+    this.ctx.strokeStyle = FRONT_COLOR;
     this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.drawImage(
-      this.assets.img("gameBg"),
-      0,
-      0,
-      this.canvas.width,
-      this.canvas.height
-    );
 
-    this.areas.cardCount.draw(this.ctx);
-    this.areas.gods.forEach((god) => {
-      god.draw(this.ctx);
-      god.expire(this.dt, this);
-    });
-    this.areas.buildings.forEach((building) => {
-      building.draw(this.ctx);
-      building.expire(this.dt, this);
+    //this.areas.cardCount.draw(this.ctx);
+    this.areas.enemies.forEach((e) => {
+      e.draw(this.ctx);
     });
 
-    this.areas.died.drawCount(this.ctx);
-    this.areas.available.drawCount(this.ctx);
-    this.areas.resting.drawCount(this.ctx);
-    this.areas.ready.draw(this.ctx);
+
+    this.areas.hand.draw(this.ctx);
+    this.areas.trash.draw(this.ctx);
+    this.areas.deck.draw(this.ctx);
+    this.areas.discard.draw(this.ctx);
+
     this.newTurn.draw(this.ctx);
-    this.showResting.draw(this.ctx);
-    this.showAvailable.draw(this.ctx);
+    this.showDiscard.draw(this.ctx);
+    this.showDeck.draw(this.ctx);
+    this.showTrash.draw(this.ctx);
 
     this.expire -= Math.min(this.expire, 1 * this.dt);
     const min = padzero(Math.floor(this.expire / 60), 2);
     const seg = padzero(Math.floor(this.expire % 60), 2);
-    this.ctx.font = `${this.canvas.height * 0.05}px 'Skranji'`;
+    this.ctx.font = `${this.canvas.height * 0.05}px 'Orbitron'`;
     this.ctx.textAlign = "center";
     this.ctx.fillStyle =
       this.expire > 30
-        ? "black"
-        : `hsl(0deg, 100%,${(1 - this.expire / 30) * 50}%`;
+        ? FRONT_COLOR
+        : `hsl(0deg, 100%, ${(1 - this.expire / 30) * 50}%`;
     this.ctx.fillText(
       `${min}:${seg}`,
       0.5 * this.canvas.width,
       0.05 * this.canvas.height
     );
-    if (this.areas.ready.people.length === 0) {
+    if (this.areas.hand.cards.length === 0) {
       this.endTurn();
     }
     if (this.expire <= 0) {
@@ -175,196 +151,207 @@ export default class GameScene {
   }
 
   createAreas() {
-    this.areas.ready = new Ready(
-      "Ready",
-      0.11 * this.canvas.height,
-      0.73 * this.canvas.height
-    );
-    this.areas.cardCount = new Area(
-      "Card Count",
-      0.135 * this.canvas.width,
-      0.901 * this.canvas.height,
-      true
-    );
-    this.areas.died = new Area("Died", 47, this.canvas.height - 53, false);
-    this.areas.resting = new Area(
-      "Resting",
-      0.29 * this.canvas.width,
-      0.9053571428571429 * this.canvas.height,
-      true
-    );
-    this.areas.available = new Area(
-      "Available",
-      0.2 * this.canvas.width,
-      0.9053571428571429 * this.canvas.height,
-      true
-    );
-    this.areas.available.loadAll(ALL_AVAILABLE, this.canvas);
-    this.endTurn();
-    this.areas.gods = [];
-    this.areas.gods.push(
-      new Sacrifices(
-        0.1875 * this.canvas.width,
-        0.14285714285714285 * this.canvas.height,
-        0
-      )
-    );
-    this.areas.gods.push(
-      new Sacrifices(
-        0.895 * this.canvas.width,
-        0.14285714285714285 * this.canvas.height,
-        0
-      )
+
+    this.areas.hand = new Ready(
+      {
+        title: "Hand",
+        x: this.canvas.width / 2,
+        y: 0.73 * this.canvas.height,
+        visible: true,
+      }
     );
 
+    this.areas.trash = new Area(
+      {
+        title: "Trash",
+        x: this.canvas.width / 2,
+        y: 0.9153571428571429 * this.canvas.height,
+        visible: false,
+        w: this.canvas.width * (4 / 5),
+      }
+    );
+    this.areas.discard = new Area(
+      {
+        title: "Discard",
+        x: this.canvas.width / 2,
+        y: 0.9153571428571429 * this.canvas.height,
+        visible: false,
+        w: this.canvas.width * (4 / 5),
+
+      }
+    );
+    this.areas.deck = new Area(
+      {
+        title: "Deck",
+        x: this.canvas.width / 2,
+        y: 0.9153571428571429 * this.canvas.height,
+        visible: false,
+        w: this.canvas.width * (4 / 5),
+
+      }
+    );
+    //this.areas.deck.loadAll(ALL_AVAILABLE, this.canvas);
+    this.areas.deck.add(new Card({ text: "Card00" }));
+    this.areas.deck.add(new Card({ text: "Card01" }));
+    this.areas.deck.add(new Card({ text: "Card02" }));
+    this.areas.deck.add(new Card({ text: "Card03" }));
+    this.areas.deck.add(new Card({ text: "Card04" }));
+    this.areas.deck.add(new Card({ text: "Card05" }));
+    this.areas.deck.add(new Card({ text: "Card06" }));
+    this.areas.deck.add(new Card({ text: "Card07" }));
+    this.areas.deck.add(new Card({ text: "Card08" }));
+    this.endTurn();
+    this.areas.discard.add(new Card({ text: "Card08" }));
+    this.areas.trash.add(new Card({ text: "Card08" }));
+    this.areas.discard.add(new Card({ text: "Card08" }));
+    this.areas.enemies = [];
+    this.areas.enemies.push(
+      new PlayArea(
+        {
+          x: 0.5 * this.canvas.width / 3,
+          y: 0.25 * this.canvas.height,
+          w: this.canvas.width / 3,
+          h: this.canvas.height / 3,
+          type: 0,
+        }
+      )
+    );
+    this.areas.enemies.push(
+      new PlayArea(
+        {
+          x: 1.5 * this.canvas.width / 3,
+          y: 0.25 * this.canvas.height,
+          w: this.canvas.width / 3,
+          h: this.canvas.height / 3,
+          type: 0
+        }
+      )
+    );
+    this.areas.enemies.push(
+      new PlayArea(
+        {
+          x: 2.5 * this.canvas.width / 3,
+          y: 0.25 * this.canvas.height,
+          w: this.canvas.width / 3,
+          h: this.canvas.height / 3,
+        }
+      )
+    );
     this.areas.buildings = [];
-    // Temple
-    this.areas.buildings.push(
-      new Activities(
-        this.canvas.width / 2,
-        0.17857142857142858 * this.canvas.height,
-        PRIEST
-      )
-    );
-    // Farm
-    this.areas.buildings.push(
-      new Activities(
-        0.53125 * this.canvas.width,
-        0.51 * this.canvas.height,
-        FARMER
-      )
-    );
-    // Senate
-    this.areas.buildings.push(
-      new Activities(
-        0.78125 * this.canvas.width,
-        0.35714285714285715 * this.canvas.height,
-        SENATOR
-      )
-    );
-    // Barracks
-    this.areas.buildings.push(
-      new Activities(
-        0.234375 * this.canvas.width,
-        0.35714285714285715 * this.canvas.height,
-        SOLDIER
-      )
-    );
-    this.newTurn = new NextTurnButton(
+    this.newTurn = new Button(
       0.85 * this.canvas.width,
       0.58 * this.canvas.height,
-      0.15625 * this.canvas.width,
-      0.09 * this.canvas.height,
-      "End Turn"
-    );
-    this.showAvailable = new Button(
-      0.81875 * this.canvas.width,
-      0.93 * this.canvas.height,
-      0.21875 * this.canvas.width,
-      0.043 * this.canvas.height,
-      "Available",
+      0.25625 * this.canvas.width,
+      0.07 * this.canvas.height,
+      "End Turn",
       false
     );
-    this.showResting = new Button(
-      0.81875 * this.canvas.width,
-      0.87 * this.canvas.height,
+    this.showDeck = new Button(
+      this.canvas.width * (0 + 1 / 3 - 1 / 5),
+      0.82 * this.canvas.height,
+      0.21875 * this.canvas.width,
+      0.043 * this.canvas.height,
+      "Deck",
+      false
+    );
+    this.showDiscard = new Button(
+      this.canvas.width * (2 / 3 - 1 / 5),
+      0.82 * this.canvas.height,
       0.21875 * this.canvas.width,
       0.045 * this.canvas.height,
-      "Resting",
+      "Discard",
+      false
+    );
+    this.showTrash = new Button(
+      this.canvas.width * (3 / 3 - 1 / 5),
+      0.82 * this.canvas.height,
+      0.21875 * this.canvas.width,
+      0.045 * this.canvas.height,
+      "Trash",
       false
     );
   }
 
   mousedown(e) {
-    const [x,y] = getXY(e, this.canvas);
-    this.areas.ready.people.forEach((s) => {
+    const [x, y] = getXY(e, this.canvas);
+    this.areas.hand.cards.forEach((s) => {
       if (s.draggable && s.hasPoint({ x, y })) {
-        this.dragging = s;
-        this.dragging.oldx = this.dragging.x;
-        this.dragging.oldy = this.dragging.y;
+        this.playedCard = s;
+        this.playedCard.oldx = this.playedCard.x;
+        this.playedCard.oldy = this.playedCard.y;
       }
     });
   }
   mouseup(e) {
-    const [x,y] = getXY(e, this.canvas);
-    if (this.dragging !== null) {
-      this.dragging.x = x;
-      this.dragging.y = y;
-      this.areas.gods.forEach((god) => {
-        const checked = god.check(x, y);
-        if (checked) {
-          if (!checked.deliver(this.dragging.type)) {
-            god.loseRep();
-            this.assets.play("thunder", false, 0.3);
-          }
-          this.assets.play("gore");
-          this.areas.died.add(this.dragging);
-          this.areas.ready.delete(this.dragging);
-          if (checked.demands.length === 0) {
-            god.gainRep();
-            checked.effect(this);
-            checked.resetDemands();
-            god.sendToBottom(checked);
-            god.resetCooldown();
-          }
-          this.dragging = null;
-          return;
+    const [x, y] = getXY(e, this.canvas);
+    if (this.playedCard !== null) {
+      this.playedCard.x = x;
+      this.playedCard.y = y;
+      this.areas.enemies.forEach((enemy) => {
+        // const checked = enemy.check(x, y);
+        if (enemy.hasPoint({ x, y })) {
+          enemy.cards.push(this.playedCard);
+          this.areas.hand.delete(this.playedCard);
         }
+        // if (checked) {
+        //   if (!checked.deliver(this.dragging.type)) {
+        //     enemy.loseRep();
+        //     this.assets.play("thunder", false, 0.3);
+        //   }
+        //   this.assets.play("gore");
+        //   this.areas.trash.add(this.dragging);
+        //   this.areas.hand.delete(this.dragging);
+        //   if (checked.demands.length === 0) {
+        //     enemy.gainRep();
+        //     checked.effect(this);
+        //     checked.resetDemands();
+        //     enemy.sendToBottom(checked);
+        //     enemy.resetCooldown();
+        //   }
+        //   this.dragging = null;
+        //   return;
+        // }
       });
-      this.areas.buildings.forEach((building) => {
-        const checked = building.check(x, y);
-        if (checked) {
-          if (!checked.deliver(this.dragging.type)) {
-            this.reputation--;
-            building.loseRep();
-            this.assets.play("wrong");
-          }
-          this.areas.resting.add(this.dragging);
-          this.areas.ready.delete(this.dragging);
-          this.assets.play("right");
-          if (checked.demands.length === 0) {
-            this.reputation++;
-            building.gainRep();
-            checked.resetDemands();
-            building.sendToBottom(checked);
-            building.resetCooldown();
-            this.assets.play("complete");
-          }
-          this.dragging = null;
-          return;
-        }
-      });
-      if (this.dragging != null) {
-        this.dragging.x = this.dragging?.oldx;
-        this.dragging.y = this.dragging?.oldy;
+      if (this.playedCard != null) {
+        this.playedCard.x = this.playedCard?.oldx;
+        this.playedCard.y = this.playedCard?.oldy;
       }
-      this.dragging = null;
+      this.playedCard = null;
     }
   }
   click(e) {
-    const [x,y] = getXY(e, this.canvas);
+    const [x, y] = getXY(e, this.canvas);
     if (this.newTurn.hasPoint({ x, y })) {
       this.endTurn();
     }
-    if (this.showAvailable.hasPoint({ x, y })) {
-      this.areas.available.visible = !this.areas.available.visible;
+    if (this.showDeck.hasPoint({ x, y })) {
+      this.areas.deck.visible = !this.areas.deck.visible;
+      this.areas.discard.visible = false;
+      this.areas.trash.visible = false;
     }
-    if (this.showResting.hasPoint({ x, y })) {
-      this.areas.resting.visible = !this.areas.resting.visible;
+    if (this.showDiscard.hasPoint({ x, y })) {
+      this.areas.deck.visible = false;
+      this.areas.discard.visible = !this.areas.discard.visible;
+      this.areas.trash.visible = false;
+    }
+    if (this.showTrash.hasPoint({ x, y })) {
+      this.areas.deck.visible = false;
+      this.areas.discard.visible = false;
+      this.areas.trash.visible = !this.areas.trash.visible;
     }
   }
   mousemove(e) {
-    const [x,y] = getXY(e, this.canvas);
-    if (this.dragging) {
-      this.dragging.x = x;
-      this.dragging.y = y;
+    const [x, y] = getXY(e, this.canvas);
+    if (this.playedCard) {
+      this.playedCard.x = x;
+      this.playedCard.y = y;
     }
   }
   mouseout(e) {
-    if (this.dragging) {
-      this.dragging.x = this.dragging?.oldx;
-      this.dragging.y = this.dragging?.oldy;
-      this.dragging = null;
+    if (this.playedCard) {
+      this.playedCard.x = this.playedCard?.oldx;
+      this.playedCard.y = this.playedCard?.oldy;
+      this.playedCard = null;
     }
   }
 
@@ -382,17 +369,17 @@ export default class GameScene {
     this.mousemove(newTouch);
   }
   endTurn() {
-    this.areas.resting.addAll(this.areas.ready);
+    this.areas.discard.addAll(this.areas.hand);
 
-    if (this.areas.available.size() <= 5) {
-      this.areas.ready.addAll(this.areas.available);
-      this.areas.available.addAll(this.areas.resting);
+    if (this.areas.deck.size() <= 5) {
+      this.areas.hand.addAll(this.areas.deck);
+      this.areas.deck.addAll(this.areas.discard);
     }
-    while (this.areas.ready.size() < 5 && this.areas.available.size() > 0) {
-      const r = Math.floor(Math.random() * this.areas.available.size());
-      const p = this.areas.available.people[r];
-      this.areas.ready.add(p);
-      this.areas.available.delete(p);
+    while (this.areas.hand.size() < 5 && this.areas.deck.size() > 0) {
+      const r = Math.floor(Math.random() * this.areas.deck.size());
+      const p = this.areas.deck.cards[r];
+      this.areas.hand.add(p);
+      this.areas.deck.delete(p);
     }
   }
 }

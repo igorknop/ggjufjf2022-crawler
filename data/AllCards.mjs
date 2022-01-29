@@ -5,8 +5,8 @@ import { PRIEST } from "./AllTimeConstants.mjs";
 
 
 export const ALL_AVAILABLE = [
-  { type: PRIEST, qty: 2 },
-  { type: FARMER, qty: 2 },
-  { type: SENATOR, qty: 2 },
-  { type: SOLDIER, qty: 2 },
+  { type: PRIEST, qty: 1 },
+  { type: FARMER, qty: 1 },
+  { type: SENATOR, qty: 1 },
+  { type: SOLDIER, qty: 1 },
 ];

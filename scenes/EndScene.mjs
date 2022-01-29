@@ -1,4 +1,5 @@
 import Button from "../Button.mjs";
+import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
 
 export default class EndScene {
@@ -53,25 +54,19 @@ export default class EndScene {
     this.t0 = this.t0 ?? t;
     this.dt = (t - this.t0) / 1000;
     this.expire += (this.expire > 0) ? -1 * this.dt : 0;
-    this.ctx.fillStyle = "hsl(200, 7%, 84%)";
+    this.ctx.fillStyle = BACKGROUND_COLOR;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.strokeStyle = "hsl(200, 7%, 74%)";
+    this.ctx.strokeStyle = FRONT_COLOR;
     this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.drawImage(
-      this.assets.img("menuBg"),
-      0,
-      0,
-      this.canvas.width,
-      this.canvas.height
-    );
+
     
     if (this.expire <= 0) {
       this.mainMenu.draw(this.ctx);
       this.newGame.draw(this.ctx);
     };
-    this.ctx.fillStyle = "black";
+    this.ctx.fillStyle = FRONT_COLOR;
     let fontSize = 0.07142857142857142 * this.canvas.height;
-    this.ctx.font = `${fontSize}px 'Skranji'`;
+    this.ctx.font = `${fontSize}px 'Orbitron'`;
     this.ctx.textAlign = "center";
     this.ctx.fillText(
       `GAME OVER!`,
@@ -79,7 +74,7 @@ export default class EndScene {
       this.canvas.height * 0.4
     );
     fontSize = 0.026785714285714284 * this.canvas.height;
-    this.ctx.font = `${fontSize}px 'Skranji'`;
+    this.ctx.font = `${fontSize}px 'Orbitron'`;
     this.ctx.textAlign = "right";
 
     for (let i = this.game.messages.length - 1; i >= 0; i--) {
@@ -107,14 +102,16 @@ export default class EndScene {
       0.7 * this.canvas.height,
       0.3 * this.canvas.width,
       0.07 * this.canvas.height,
-      "New Game"
+      "New Game",
+      false
     );
     this.mainMenu = new Button(
       0.5 * this.canvas.width,
       0.8 * this.canvas.height,
       0.3 * this.canvas.width,
       0.07 * this.canvas.height,
-      "Main Menu"
+      "Main Menu",
+      false
     );
   }
 

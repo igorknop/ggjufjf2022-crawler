@@ -1,7 +1,7 @@
 import Activity from "./Activity.mjs";
 import People from "./People.mjs";
 import { shuffleArray } from "./util/shuffle.mjs";
-import { PH, PW } from "./data/AllTimeConstants.mjs";
+import { CARD_H, CARD_W } from "./data/AllTimeConstants.mjs";
 import Activities from "./Activities.mjs";
 import { assets } from "./Game.mjs";
 import { PRIEST } from "./data/AllTimeConstants.mjs";
@@ -28,9 +28,9 @@ export default class Sacrifices extends Activities {
     let w = 0.33 * canvas.width;
     const h = w / r;
     if (this.cooldown > 0) {
-      ctx.globalAlpha = 0.0;
+      ctx.globalAlCARD_Ha = 0.0;
     } else {
-      ctx.globalAlpha = 0.6;
+      ctx.globalAlCARD_Ha = 0.6;
     }
     ctx.drawImage(
       assets.img(`god${this.godMode}${this.activities[0].type}`),
@@ -39,7 +39,7 @@ export default class Sacrifices extends Activities {
       w,
       h
     );
-    ctx.globalAlpha = 1;
+    ctx.globalAlCARD_Ha = 1;
     super.draw(ctx);
   }
 

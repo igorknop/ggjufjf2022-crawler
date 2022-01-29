@@ -1,68 +1,86 @@
-import People from "./People.mjs";
+import Card from "./Card.mjs";
+import { CARD_H, CARD_W } from "./data/AllTimeConstants.mjs";
+import { BACKGROUND_COLOR, FRONT_COLOR } from "./util/Colors.mjs";
 
 export default class Area {
-  constructor(title = "", x = 0, y = 300, visible = true) {
+  constructor({ title = "", x = 0, y = 0, visible = true, cards = [], max = 5, gap = 2, w = (CARD_W * 5 + 12), h = CARD_H + 12 }) {
     this.x = x;
     this.y = y;
-    this.people = [];
+    this.cards = cards;
     this.title = title;
-    this.max = 5;
+    this.max = max;
     this.visible = visible;
-    this.gap = 2;
+    this.gap = gap;
+    this.w = w;
+    this.h = h;
   }
 
-  loadAll(people, canvas) {
-    people.forEach((p) => {
+  loadAll(cardList) {
+    cardList.forEach((p) => {
       for (let c = 0; c < p.qty; c++) {
-        this.add(new People({ type: p.type }));
+        this.add(new Card({ text: p.type }));
       }
     });
   }
 
-  add(people) {
-    const n = this.people.length;
-    const l = Math.floor(n / this.max);
-    const c = n % this.max;
-    people.x =
-      this.x + (people.w + this.gap) * c + (l % 2 === 0 ? 0 : people.w / 2);
-    people.y = this.y + (people.h / 3) * l;
-    people.draggable = false;
-    this.people.push(people);
+  add(card) {
+    card.draggable = false;
+    this.cards.push(card);
+    this.updatePositions();
+  }
+
+  updatePositions() {
+    this.cards.forEach((card, k) => {
+      const n = k;
+      const l = Math.floor(n / this.max);
+      const c = n % this.max;
+      card.x =
+        this.x - this.w/2 + card.w/2 + this.gap + (card.w + this.gap) * c + (l % 2 === 0 ? 0 : card.w / 2);
+      card.y = this.y  + (card.h / 3) * l;
+  
+    });    
   }
 
   draw(ctx) {
     if (!this.visible) return;
-    ctx.fillStyle = "white";
-    //ctx.font = "25px monospace";
-    //ctx.fillText(this.title, this.x, this.y - 50);
-    this.people.forEach((p) => {
+    ctx.strokeStyle = FRONT_COLOR;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+    ctx.lineWidth = 1;
+    ctx.font = "15px 'Orbitron'";
+    ctx.fillStyle = FRONT_COLOR;
+    ctx.fillText(this.title, this.x, this.y);
+    this.cards.forEach((p) => {
       p.draw(ctx);
     });
   }
 
-  transfer(sourceArea, quantity = 2) {
-    let transferPeople = sourceArea.people.splice(0, quantity);
-    transferPeople.forEach((person) => {
+  transfer(sourceArea, quantity = 1) {
+    let transferCard = sourceArea.cards.splice(0, quantity);
+    transferCard.forEach((person) => {
       this.add(person);
     });
+    this.updatePositions();
   }
 
   addAll(sourceArea) {
     this.transfer(sourceArea, sourceArea.size());
+    this.updatePositions();
   }
 
-  delete(people) {
-    const idx = this.people.indexOf(people);
-    this.people.splice(idx, 1);
+  delete(card) {
+    const idx = this.cards.indexOf(card);
+    this.cards.splice(idx, 1);
+    this.updatePositions();
   }
 
   size() {
-    return this.people.length;
+    return this.cards.length;
   }
 
   countPeople() {
     let count = [0, 0, 0, 0];
-    this.people.forEach((person) => {
+    this.cards.forEach((person) => {
       count[person.type]++;
     });
     return count;

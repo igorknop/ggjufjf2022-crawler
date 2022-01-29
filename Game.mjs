@@ -4,7 +4,7 @@ import GameScene from "./scenes/GameScene.mjs";
 import CreditsScene from "./scenes/CreditsScene.mjs";
 import RulesScene from "./scenes/RulesScene.mjs";
 import AssetManager from "./AssetManager.mjs";
-import { FARMER, SOLDIER, SENATOR, PRIEST, setPeopleSize } from "./data/AllTimeConstants.mjs";
+import { FARMER, SOLDIER, SENATOR, PRIEST, setCardSize } from "./data/AllTimeConstants.mjs";
 
 export const assets = new AssetManager();
 assets.loadImage("menuBg", "./assets/background.png");
@@ -47,7 +47,7 @@ export default class Game {
     const r = 0.115;
     const w = canvas.height * r * 0.75;
     const h = canvas.height * r;
-    setPeopleSize(w,h);
+    setCardSize(w,h);
   }
   addScene(key, scene) {
     scene.game = this;
