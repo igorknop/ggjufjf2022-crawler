@@ -16,6 +16,12 @@ export default class GameScene {
   constructor(canvas, ctx) {
     this.canvas = canvas;
     this.ctx = ctx;
+    this.player = {
+      hitPoints: 5,
+      damage: 0,
+      monstersKilled: 0,
+      coins: 0,
+    }
     this.grace = 5;
     this.reputation = 5;
     this.playedCard = null;
@@ -134,6 +140,7 @@ export default class GameScene {
       0.5 * this.canvas.width,
       0.05 * this.canvas.height
     );
+    this.drawHud(this.ctx);
     if (this.areas.hand.cards.length === 0) {
       this.endTurn();
     }
@@ -366,7 +373,23 @@ export default class GameScene {
       this.areas.deck.delete(p);
     }
   }
+
+  drawHud(ctx){
+    for (let h = 0; h < this.player.hitPoints; h++) {
+        ctx.fillStyle = FRONT_COLOR;
+        ctx.fillRect(this.canvas.width*0.10+ h * 12, this.canvas.height*0.64, 10, 10);
+    }
+    for (let h = 0; h < this.player.damage; h++) {
+        ctx.fillStyle = FRONT_COLOR;
+        ctx.beginPath();
+        ctx.ellipse(this.canvas.width*0.9 - h * 12 , this.canvas.height*0.647, 5, 5, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.closePath();
+    }
+
+  }
 }
 function padzero(num, places) {
   return String(num).padStart(places, "0");
 }
+
