@@ -1,7 +1,7 @@
-import Card from "./Card.mjs";
-import CrawlerCard from "./CrawlerCard.mjs";
-import { CARD_H, CARD_W } from "./data/AllTimeConstants.mjs";
-import { BACKGROUND_COLOR, FRONT_COLOR } from "./util/Colors.mjs";
+import Card from "../Card.mjs";
+import CrawlerCard from "../CrawlerCard.mjs";
+import { CARD_H, CARD_W } from "../data/AllTimeConstants.mjs";
+import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 
 export default class Area {
   constructor({ title = "", x = 0, y = 0, visible = true, cards = [], max = 5, gap = 2, w = (CARD_W * 5 + 12), h = CARD_H + 12 }) {

@@ -1,7 +1,7 @@
-import { TYPE_COLOR , FAST, CARD_H } from "./data/AllTimeConstants.mjs";
-import { assets } from "./Game.mjs";
-import Sprite from "./Sprite.mjs";
-import { FRONT_COLOR } from "./util/Colors.mjs";
+import { TYPE_COLOR , FAST, CARD_H } from "../data/AllTimeConstants.mjs";
+import { assets } from "../Game.mjs";
+import Sprite from "../Sprite.mjs";
+import { FRONT_COLOR } from "../util/Colors.mjs";
 
 export default class PlayArea extends Sprite {
   constructor({

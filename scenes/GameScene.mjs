@@ -1,4 +1,4 @@
-import Area from "../Area.mjs";
+import Area from "../areas/Area.mjs";
 import EnemyArea from "../areas/EnemyArea.mjs";
 import Button from "../Button.mjs";
 import Card from "../Card.mjs";
@@ -6,8 +6,8 @@ import CrawlerCard from "../CrawlerCard.mjs";
 import { ALL_AVAILABLE } from "../data/AllCards.mjs";
 import { GAME_TIME } from "../data/AllTimeConstants.mjs";
 import { CARDS_GIANT_RAT } from "../data/CardsGiantRat.mjs";
-import PlayArea from "../PlayArea.mjs";
-import Ready from "../Ready.mjs";
+import PlayArea from "../areas/PlayArea.mjs";
+import Ready from "../areas/Ready.mjs";
 import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
 

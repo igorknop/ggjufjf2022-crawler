@@ -1,4 +1,4 @@
-import PlayArea from "../PlayArea.mjs";
+import PlayArea from "./PlayArea.mjs";
 import { TYPE_COLOR, FAST, CARD_H } from "../data/AllTimeConstants.mjs";
 import { assets } from "../Game.mjs";
 import Sprite from "../Sprite.mjs";
