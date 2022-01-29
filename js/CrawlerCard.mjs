@@ -1,8 +1,8 @@
 import Sprite from "./Sprite.mjs";
-import { TYPE_COLOR } from "./data/AllTimeConstants.mjs";
+import { TYPE_COLOR } from "../data/AllTimeConstants.mjs";
 import { assets } from "./Game.mjs";
-import { CARD_W } from "./data/AllTimeConstants.mjs";
-import { CARD_H } from "./data/AllTimeConstants.mjs";
+import { CARD_W } from "../data/AllTimeConstants.mjs";
+import { CARD_H } from "../data/AllTimeConstants.mjs";
 import { BACKGROUND_COLOR, FRONT_COLOR } from "./util/Colors.mjs";
 import Card from "./Card.mjs";
 

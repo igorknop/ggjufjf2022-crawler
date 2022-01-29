@@ -1,5 +1,5 @@
-import { CARD_H, CARD_W, PRIEST } from "./data/AllTimeConstants.mjs";
-import { TYPE_COLOR } from "./data/AllTimeConstants.mjs";
+import { CARD_H, CARD_W, PRIEST } from "../data/AllTimeConstants.mjs";
+import { TYPE_COLOR } from "../data/AllTimeConstants.mjs";
 
 
 export default class Sprite {

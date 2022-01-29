@@ -1,4 +1,4 @@
-import { BACKGROUND_COLOR } from "../util/Colors.mjs";
+import { BACKGROUND_COLOR } from "../js/util/Colors.mjs";
 
 export const PRIEST = 0;
 export const FARMER = 1;

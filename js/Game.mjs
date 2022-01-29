@@ -4,7 +4,7 @@ import GameScene from "./scenes/GameScene.mjs";
 import CreditsScene from "./scenes/CreditsScene.mjs";
 import RulesScene from "./scenes/RulesScene.mjs";
 import AssetManager from "./AssetManager.mjs";
-import { FARMER, SOLDIER, SENATOR, PRIEST, setCardSize } from "./data/AllTimeConstants.mjs";
+import { FARMER, SOLDIER, SENATOR, PRIEST, setCardSize } from "../data/AllTimeConstants.mjs";
 
 export const assets = new AssetManager();
 assets.loadImage("menuBg", "./assets/background.png");
