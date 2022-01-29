@@ -65,7 +65,7 @@ export default class GameScene {
   }
 
   setup() {
-    this.expire = GAME_TIME;
+    this.expire = 40;//GAME_TIME;
     this.playedCard = null;
     this.t0 = null;
     this.dt = null;
@@ -142,9 +142,9 @@ export default class GameScene {
     this.ctx.font = `${this.canvas.height * 0.05}px 'Orbitron'`;
     this.ctx.textAlign = "center";
     this.ctx.fillStyle =
-      this.expire > 30
+      this.expire > 38
         ? FRONT_COLOR
-        : `hsl(0deg, 100%, ${(1 - (30 - this.expire) / 30) * 50}%`;
+        : `hsl(0deg, ${(2-this.expire/38)*50}%,  ${(2-this.expire/38)*50}%)`;
     this.ctx.fillText(
       `${min}:${seg}`,
       0.5 * this.canvas.width,
