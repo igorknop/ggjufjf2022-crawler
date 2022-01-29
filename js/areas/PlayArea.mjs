@@ -1,7 +1,7 @@
-import { TYPE_COLOR , FAST, CARD_H } from "./data/AllTimeConstants.mjs";
-import { assets } from "./Game.mjs";
-import Sprite from "./Sprite.mjs";
-import { FRONT_COLOR } from "./util/Colors.mjs";
+import { TYPE_COLOR , FAST, CARD_H } from "../../data/AllTimeConstants.mjs";
+import { assets } from "../Game.mjs";
+import Sprite from "../Sprite.mjs";
+import { FRONT_COLOR } from "../util/Colors.mjs";
 
 export default class PlayArea extends Sprite {
   constructor({
@@ -39,11 +39,23 @@ export default class PlayArea extends Sprite {
       c.y = y;
       c.draw(ctx);
     });
-    const x = this.x - w * 2.5;
-    const y = this.y + h * 1.65;
   }
+
   add(card) {
     this.cards.push(card);
+    this.updatePositions();
     return true;
   }
+  updatePositions() {
+    this.cards.forEach((card, k) => {
+      const n = k;
+      const l = Math.floor(n / this.max);
+      const c = n % this.max;
+      card.x =
+        this.x - this.w/2 + card.w/2 + this.gap + (card.w + this.gap) * c + (l % 2 === 0 ? 0 : card.w / 2);
+      card.y = this.y  + (card.h / 3) * l;
+  
+    });    
+  }
+
 }

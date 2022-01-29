@@ -1,8 +1,7 @@
 import Sprite from "./Sprite.mjs";
-import { TYPE_COLOR } from "./data/AllTimeConstants.mjs";
 import { assets } from "./Game.mjs";
-import { CARD_W } from "./data/AllTimeConstants.mjs";
-import { CARD_H } from "./data/AllTimeConstants.mjs";
+import { CARD_W } from "../data/AllTimeConstants.mjs";
+import { CARD_H } from "../data/AllTimeConstants.mjs";
 import { BACKGROUND_COLOR, FRONT_COLOR } from "./util/Colors.mjs";
 
 const PEOPLE_IMAGES = [
@@ -28,5 +27,9 @@ export default class Card extends Sprite {
     ctx.fillStyle = FRONT_COLOR;
     ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
     ctx.fillText(this.text, this.x, this.y + this.w * 0.04);
+  }
+
+  getHint(){
+    return this.text;
   }
 }

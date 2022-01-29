@@ -1,7 +1,7 @@
-import Activity from "./Activity.mjs";
-import People from "./People.mjs";
-import { shuffleArray } from "./util/shuffle.mjs";
-import { CARD_H, CARD_W } from "./data/AllTimeConstants.mjs";
+import Activity from "../Activity.mjs";
+import People from "../People.mjs";
+import { shuffleArray } from "../util/shuffle.mjs";
+import { CARD_H, CARD_W } from "../data/AllTimeConstants.mjs";
 
 export const REPUTATION = 4;
 export const SPAWN = 60.0;

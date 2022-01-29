@@ -1,17 +1,27 @@
-import Area from "../Area.mjs";
+import Area from "../areas/Area.mjs";
+import EnemyArea from "../areas/EnemyArea.mjs";
 import Button from "../Button.mjs";
 import Card from "../Card.mjs";
-import { ALL_AVAILABLE } from "../data/AllCards.mjs";
-import { GAME_TIME } from "../data/AllTimeConstants.mjs";
-import PlayArea from "../PlayArea.mjs";
-import Ready from "../Ready.mjs";
+import CrawlerCard from "../CrawlerCard.mjs";
+import { ALL_AVAILABLE } from "../../data/AllCards.mjs";
+import { GAME_TIME } from "../../data/AllTimeConstants.mjs";
+import { CARDS_GIANT_RAT } from "../../data/cards/CardsGiantRat.mjs";
+import { CARDS_SLIME } from "../../data/cards/CardsSlime.mjs";
+import PlayArea from "../areas/PlayArea.mjs";
+import Ready from "../areas/Ready.mjs";
 import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
 
 export default class GameScene {
-  constructor(canvas) {
+  constructor(canvas, ctx) {
     this.canvas = canvas;
-    this.ctx = this.canvas.getContext("2d");
+    this.ctx = ctx;
+    this.player = {
+      hitPoints: 5,
+      damage: 0,
+      monstersKilled: 0,
+      coins: 0,
+    }
     this.grace = 5;
     this.reputation = 5;
     this.playedCard = null;
@@ -33,11 +43,12 @@ export default class GameScene {
     const totalBuildReputations =
       4 * this.areas.buildings.reduce((a, c) => a + c.reputation - 2, 0);
     this.game.messages.push(
-      `Building's Reputation:\t\t${totalBuildReputations}`
+      `Character Skills:\t\t${totalBuildReputations}`
     );
     const totalGodReputations =
       8 * this.areas.enemies.reduce((a, c) => a + c.reputation - 2, 0);
-    this.game.messages.push(`God's Grace:\t\t${totalGodReputations}`);
+    this.game.messages.push(`Character Level:\t\t${totalGodReputations}`);
+    this.game.messages.push(`Monsters Slain:\t\t${totalGodReputations}`);
     let total = 0;
     total += totalBuildReputations;
     total += totalGodReputations;
@@ -89,13 +100,6 @@ export default class GameScene {
       this.touchmove(e);
     };
 
-
-
-    //this.areas.enemies[0].loadAll(ALL_GOD_A_CARDS, this.canvas);
-    //this.areas.enemies[0].godMode = "A";
-    //this.areas.enemies[1].loadAll(ALL_GOD_B_CARDS, this.canvas);
-    //this.areas.enemies[1].godMode = "B";
-
   }
 
   step(t) {
@@ -136,6 +140,7 @@ export default class GameScene {
       0.5 * this.canvas.width,
       0.05 * this.canvas.height
     );
+    this.drawHud(this.ctx);
     if (this.areas.hand.cards.length === 0) {
       this.endTurn();
     }
@@ -190,53 +195,39 @@ export default class GameScene {
 
       }
     );
-    //this.areas.deck.loadAll(ALL_AVAILABLE, this.canvas);
-    this.areas.deck.add(new Card({ text: "Card00" }));
-    this.areas.deck.add(new Card({ text: "Card01" }));
-    this.areas.deck.add(new Card({ text: "Card02" }));
-    this.areas.deck.add(new Card({ text: "Card03" }));
-    this.areas.deck.add(new Card({ text: "Card04" }));
-    this.areas.deck.add(new Card({ text: "Card05" }));
-    this.areas.deck.add(new Card({ text: "Card06" }));
-    this.areas.deck.add(new Card({ text: "Card07" }));
-    this.areas.deck.add(new Card({ text: "Card08" }));
+    this.areas.deck.loadAll(CARDS_SLIME.map((c) => new CrawlerCard(c)));
     this.endTurn();
-    this.areas.discard.add(new Card({ text: "Card08" }));
-    this.areas.trash.add(new Card({ text: "Card08" }));
-    this.areas.discard.add(new Card({ text: "Card08" }));
-    this.areas.enemies = [];
-    this.areas.enemies.push(
-      new PlayArea(
-        {
-          x: 0.5 * this.canvas.width / 3,
-          y: 0.25 * this.canvas.height,
-          w: this.canvas.width / 3,
-          h: this.canvas.height / 3,
-          type: 0,
-        }
-      )
-    );
-    this.areas.enemies.push(
-      new PlayArea(
+    this.areas.enemies = [
+      new EnemyArea(
+      {
+        x: 0.5 * this.canvas.width / 3,
+        y: 0.25 * this.canvas.height,
+        w: this.canvas.width / 3,
+        h: this.canvas.height / 3,
+        type: 0,
+        enemy: CARDS_SLIME.map(c => new CrawlerCard(c)),
+      }),
+      new EnemyArea(
         {
           x: 1.5 * this.canvas.width / 3,
           y: 0.25 * this.canvas.height,
           w: this.canvas.width / 3,
           h: this.canvas.height / 3,
-          type: 0
+          type: 0,
+          enemy: CARDS_GIANT_RAT.map(c => new CrawlerCard(c)),
         }
-      )
-    );
-    this.areas.enemies.push(
-      new PlayArea(
+      ),
+      new EnemyArea(
         {
           x: 2.5 * this.canvas.width / 3,
           y: 0.25 * this.canvas.height,
           w: this.canvas.width / 3,
           h: this.canvas.height / 3,
-        }
-      )
-    );
+          type: 0,
+          enemy: CARDS_GIANT_RAT.map(c => new CrawlerCard(c)),
+        }),
+    ];
+
     this.areas.buildings = [];
     this.newTurn = new Button(
       0.85 * this.canvas.width,
@@ -287,11 +278,11 @@ export default class GameScene {
     if (this.playedCard !== null) {
       this.playedCard.x = x;
       this.playedCard.y = y;
-      this.areas.enemies.forEach((enemy) => {
+      this.areas.enemies.forEach((enemyArea) => {
         // const checked = enemy.check(x, y);
-        if (enemy.hasPoint({ x, y })) {
-          enemy.cards.push(this.playedCard);
-          this.areas.hand.delete(this.playedCard);
+        if (enemyArea.hasPoint({ x, y })) {
+          this.areas.hand.delete(this.playedCard)
+          enemyArea.add(this.playedCard);
         }
         // if (checked) {
         //   if (!checked.deliver(this.dragging.type)) {
@@ -382,7 +373,23 @@ export default class GameScene {
       this.areas.deck.delete(p);
     }
   }
+
+  drawHud(ctx){
+    for (let h = 0; h < this.player.hitPoints; h++) {
+        ctx.fillStyle = FRONT_COLOR;
+        ctx.fillRect(this.canvas.width*0.10+ h * 12, this.canvas.height*0.64, 10, 10);
+    }
+    for (let h = 0; h < this.player.damage; h++) {
+        ctx.fillStyle = FRONT_COLOR;
+        ctx.beginPath();
+        ctx.ellipse(this.canvas.width*0.9 - h * 12 , this.canvas.height*0.647, 5, 5, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.closePath();
+    }
+
+  }
 }
 function padzero(num, places) {
   return String(num).padStart(places, "0");
 }
+

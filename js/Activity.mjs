@@ -1,6 +1,6 @@
-import { TYPE_COLOR , FAST, CARD_H } from "./data/AllTimeConstants.mjs";
+import { TYPE_COLOR , FAST, CARD_H } from "../data/AllTimeConstants.mjs";
 import { assets } from "./Game.mjs";
-import Sprite from "./Sprite.mjs";
+import Sprite from "../Sprite.mjs";
 
 export default class Activity extends Sprite {
   constructor({

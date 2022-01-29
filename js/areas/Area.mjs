@@ -1,6 +1,5 @@
-import Card from "./Card.mjs";
-import { CARD_H, CARD_W } from "./data/AllTimeConstants.mjs";
-import { BACKGROUND_COLOR, FRONT_COLOR } from "./util/Colors.mjs";
+import { CARD_H, CARD_W } from "../../data/AllTimeConstants.mjs";
+import { FRONT_COLOR } from "../util/Colors.mjs";
 
 export default class Area {
   constructor({ title = "", x = 0, y = 0, visible = true, cards = [], max = 5, gap = 2, w = (CARD_W * 5 + 12), h = CARD_H + 12 }) {
@@ -16,10 +15,8 @@ export default class Area {
   }
 
   loadAll(cardList) {
-    cardList.forEach((p) => {
-      for (let c = 0; c < p.qty; c++) {
-        this.add(new Card({ text: p.type }));
-      }
+    cardList.forEach((c) => {
+        this.add(c);
     });
   }
 
@@ -70,8 +67,9 @@ export default class Area {
 
   delete(card) {
     const idx = this.cards.indexOf(card);
-    this.cards.splice(idx, 1);
+    const targetCard = this.cards.splice(idx, 1);
     this.updatePositions();
+    return targetCard;
   }
 
   size() {

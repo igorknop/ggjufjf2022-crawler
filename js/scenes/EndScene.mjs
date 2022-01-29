@@ -3,10 +3,10 @@ import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
 
 export default class EndScene {
-  constructor(canvas) {
+  constructor(canvas, ctx) {
     this.canvas = canvas;
-    this.ctx = this.canvas.getContext("2d");
-    this.expire = 180;
+    this.ctx = ctx;
+    this.expire = 2;
     this.grace = 5;
     this.reputation = 5;
     this.dragging = null;
@@ -21,11 +21,9 @@ export default class EndScene {
       this.step(t);
     });
   }
-  stop(){
-    
-  }
-
+  stop() {}
   setup() {
+    this.expire = 2;
     this.canvas.onmousedown = (e) => {
       this.mousedown(e);
     };
@@ -55,24 +53,43 @@ export default class EndScene {
   step(t) {
     this.t0 = this.t0 ?? t;
     this.dt = (t - this.t0) / 1000;
+    this.expire += (this.expire > 0) ? -1 * this.dt : 0;
     this.ctx.fillStyle = BACKGROUND_COLOR;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.strokeStyle = FRONT_COLOR;
     this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
 
+    
+    if (this.expire <= 0) {
+      this.mainMenu.draw(this.ctx);
+      this.newGame.draw(this.ctx);
+    };
     this.ctx.fillStyle = FRONT_COLOR;
-    let fontSize = 0.075 * this.canvas.height;
+    let fontSize = 0.07142857142857142 * this.canvas.height;
     this.ctx.font = `${fontSize}px 'Orbitron'`;
     this.ctx.textAlign = "center";
-    this.ctx.fillText(`Credits`, this.canvas.width/2, 0.4*this.canvas.height);
-
-    fontSize = 0.02271428571428571 * this.canvas.height;
+    this.ctx.fillText(
+      `GAME OVER!`,
+      this.canvas.width / 2,
+      this.canvas.height * 0.4
+    );
+    fontSize = 0.026785714285714284 * this.canvas.height;
     this.ctx.font = `${fontSize}px 'Orbitron'`;
-    this.ctx.fillText(`Igor Knop (Game Design/Programming)`, 0.5*this.canvas.width, 0.55*this.canvas.height);
-    this.ctx.fillText(`Codebase of Forgothen Gods of GGJ21`, 0.5*this.canvas.width, 0.75*this.canvas.height);
+    this.ctx.textAlign = "right";
 
-    this.mainMenu.draw(this.ctx);
-
+    for (let i = this.game.messages.length - 1; i >= 0; i--) {
+      const message = this.game.messages[i];
+      if (message.indexOf("-") >= 0) {
+        this.ctx.fillStyle = "red";
+      } else {
+        this.ctx.fillStyle = "hsl(0,0%,20%)";
+      }
+      this.ctx.fillText(
+        message,
+        0.85 * this.canvas.width,
+        (0.46 + i * 0.04) * this.canvas.height
+      );
+    }
     requestAnimationFrame((t) => {
       this.step(t);
     });
@@ -80,27 +97,41 @@ export default class EndScene {
   }
 
   createAreas() {
+    this.newGame = new Button(
+      0.5 * this.canvas.width,
+      0.7 * this.canvas.height,
+      0.3 * this.canvas.width,
+      0.07 * this.canvas.height,
+      "New Game",
+      false
+    );
     this.mainMenu = new Button(
       0.5 * this.canvas.width,
-      0.85 * this.canvas.height,
-      0.25 * this.canvas.width,
-      0.05357142857142857 * this.canvas.height,
+      0.8 * this.canvas.height,
+      0.3 * this.canvas.width,
+      0.07 * this.canvas.height,
       "Main Menu",
       false
     );
   }
 
   mousedown(e) {
-    const [x,y] = getXY(e, this.canvas);
+    if (this.expire > 0) return;
+    const [x, y] = getXY(e, this.canvas);
 
+    if (this.newGame.hasPoint({ x, y })) {
+      this.game.setScene("game");
+    }
     if (this.mainMenu.hasPoint({ x, y })) {
       this.game.setScene("start");
     }
   }
   mouseup(e) {}
   click(e) {
-    const [x,y] = getXY(e, this.canvas);
+    const [x, y] = getXY(e, this.canvas);
 
+    if (this.newGame.hasPoint({ x, y })) {
+    }
   }
   mousemove(e) {}
   mouseout(e) {}
