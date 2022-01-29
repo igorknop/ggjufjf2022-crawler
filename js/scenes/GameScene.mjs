@@ -120,48 +120,49 @@ export default class GameScene {
     });
 
 
-    this.areas.hand.draw(this.ctx);
     this.areas.trash.draw(this.ctx);
     this.areas.deck.draw(this.ctx);
     this.areas.discard.draw(this.ctx);
     this.areas.loot.draw(this.ctx);
-
+    
     this.newTurn.draw(this.ctx);
     this.showDiscard.draw(this.ctx);
     this.showDeck.draw(this.ctx);
     this.showTrash.draw(this.ctx);
-
+    
     this.expire -= Math.min(this.expire, 1 * this.dt);
     const min = padzero(Math.floor(this.expire / 60), 2);
     const seg = padzero(Math.floor(this.expire % 60), 2);
     this.ctx.font = `${this.canvas.height * 0.05}px 'Orbitron'`;
     this.ctx.textAlign = "center";
     this.ctx.fillStyle =
-      this.expire > 38
-        ? FRONT_COLOR
-        : `hsl(0deg, ${(2 - this.expire / 38) * 50}%,  ${(2 - this.expire / 38) * 50}%)`;
+    this.expire > 38
+    ? FRONT_COLOR
+    : `hsl(0deg, ${(2 - this.expire / 38) * 50}%,  ${(2 - this.expire / 38) * 50}%)`;
     this.ctx.fillText(
       `${min}:${seg}`,
       0.5 * this.canvas.width,
       0.05 * this.canvas.height
-    );
-    this.drawHud(this.ctx);
-    // if (this.areas.hand.cards.length === 0) {
-    //   this.endTurn();
-    // }
-    if (this.expire <= 0 || (this.player.damage >= this.player.hitPoints)) {
-      //cancelAnimationFrame(this.animID);
-
-      this.game.setScene("end");
-      return;
-    }
-    this.animID = requestAnimationFrame((t) => {
-      this.step(t);
-    });
-    this.t0 = t;
-  }
-
-  createAreas() {
+      );
+      this.drawHud(this.ctx);
+      this.areas.hand.draw(this.ctx);
+      this.playedCard?.draw(this.ctx);
+      // if (this.areas.hand.cards.length === 0) {
+        //   this.endTurn();
+        // }
+        if (this.expire <= 0 || (this.player.damage >= this.player.hitPoints)) {
+          //cancelAnimationFrame(this.animID);
+          
+          this.game.setScene("end");
+          return;
+        }
+        this.animID = requestAnimationFrame((t) => {
+          this.step(t);
+        });
+        this.t0 = t;
+      }
+      
+      createAreas() {
 
     this.areas.hand = new Ready(
       {

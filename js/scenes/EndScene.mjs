@@ -82,7 +82,7 @@ export default class EndScene {
       if (message.indexOf("-") >= 0) {
         this.ctx.fillStyle = "red";
       } else {
-        this.ctx.fillStyle = "hsl(0deg, 0%, 100%)";
+        this.ctx.fillStyle = FRONT_COLOR;
       }
       this.ctx.fillText(
         message,
