@@ -17,12 +17,7 @@ export default class GameScene {
   constructor(canvas, ctx) {
     this.canvas = canvas;
     this.ctx = ctx;
-    this.player = {
-      hitPoints: 5,
-      damage: 0,
-      monstersKilled: 0,
-      coins: 0,
-    }
+    this.player = createPlayerData();
     this.grace = 5;
     this.reputation = 5;
     this.playedCard = null;
@@ -48,8 +43,13 @@ export default class GameScene {
     );
     const totalGodReputations =
       8 * this.areas.enemies.reduce((a, c) => a + c.reputation - 2, 0);
-    this.game.messages.push(`Character Level:\t\t${totalGodReputations}`);
-    this.game.messages.push(`Monsters Slain:\t\t${totalGodReputations}`);
+    for (const key in this.player.stats) {
+      if (Object.hasOwnProperty.call(this.player.stats, key)) {
+        const value = this.player.stats[key];
+        this.game.messages.push(`${key}: ${value}`);
+
+      }
+    }
     let total = 0;
     total += totalBuildReputations;
     total += totalGodReputations;
@@ -65,18 +65,13 @@ export default class GameScene {
   }
 
   setup() {
-    this.expire = 40;//GAME_TIME;
+    this.expire = GAME_TIME;
     this.playedCard = null;
     this.t0 = null;
     this.dt = null;
     this.areas = {};
     const touches = [];
-    this.player = {
-      hitPoints: 5,
-      damage: 0,
-      monstersKilled: 0,
-      coins: 0,
-    }
+    this.player = createPlayerData();
     this.loot = [];
 
     this.createAreas();
@@ -144,7 +139,7 @@ export default class GameScene {
     this.ctx.fillStyle =
       this.expire > 38
         ? FRONT_COLOR
-        : `hsl(0deg, ${(2-this.expire/38)*50}%,  ${(2-this.expire/38)*50}%)`;
+        : `hsl(0deg, ${(2 - this.expire / 38) * 50}%,  ${(2 - this.expire / 38) * 50}%)`;
     this.ctx.fillText(
       `${min}:${seg}`,
       0.5 * this.canvas.width,
@@ -156,6 +151,7 @@ export default class GameScene {
     // }
     if (this.expire <= 0 || (this.player.damage >= this.player.hitPoints)) {
       //cancelAnimationFrame(this.animID);
+
       this.game.setScene("end");
       return;
     }
@@ -351,6 +347,22 @@ export default class GameScene {
       this.areas.discard.visible = false;
       this.areas.trash.visible = !this.areas.trash.visible;
     }
+
+    this.areas.loot.cards.forEach((lootedCard) => {
+      // const checked = enemy.check(x, y);
+      if (lootedCard.hasPoint({ x, y })) {
+        this.areas.loot.delete(lootedCard)
+        this.areas.discard.add(lootedCard);
+        this.player.stats.lootedCards++;
+
+        this.player.coins += this.areas.loot.size();
+        this.player.stats.coinsGained += this.areas.loot.size();
+
+        this.areas.trash.addAll(this.areas.loot);
+
+      }
+    });
+
   }
   mousemove(e) {
     const [x, y] = getXY(e, this.canvas);
@@ -383,7 +395,7 @@ export default class GameScene {
 
   endTurn() {
     this.areas.enemies.forEach((enemyArea) => {
-      enemyArea.resolveEffects(this);  
+      enemyArea.resolveEffects(this);
     });
     this.areas.discard.addAll(this.areas.hand);
     this.areas.enemies.forEach((enemyArea) => {
@@ -427,3 +439,21 @@ function padzero(num, places) {
   return String(num).padStart(places, "0");
 }
 
+function createPlayerData() {
+  return {
+    hitPoints: 5,
+    damage: 0,
+    coins: 0,
+
+    stats: {
+      monstersKilled: 0,
+      lootedCards: 0,
+      damageTaken: 0,
+      damageBlocked: 0,
+      damageDealt: 0,
+      level: 1,
+      coinsGained: 0,
+      coinsSpent: 0,
+    }
+  }
+}

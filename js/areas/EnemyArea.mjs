@@ -28,7 +28,7 @@ export default class EnemyArea extends PlayArea {
 
     draw(ctx) {
         let fontSize = 0.025 * ctx.canvas.width;
-        ctx.font = `${fontSize}px 'Orbitron'`;  
+        ctx.font = `${fontSize}px 'Orbitron'`;
         ctx.strokeStyle = FRONT_COLOR;
         ctx.lineWidth = 1;
         ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
@@ -87,27 +87,29 @@ export default class EnemyArea extends PlayArea {
 
         this.cards.forEach(card => {
             card.player.effects.forEach(effect => {
-                if(effect.type === EFFECT_ATTACK){
+                if (effect.type === EFFECT_ATTACK) {
                     playerTotalDamage += effect.value;
-                } else if(effect.type === EFFECT_DEFENSE){
+                } else if (effect.type === EFFECT_DEFENSE) {
                     playerTotalDefense += effect.value;
-                } else if (effect.type === EFFECT_REGENERATION){
+                } else if (effect.type === EFFECT_REGENERATION) {
                     playerTotalRegeneration += effect.value;
                 }
             });
         });
-        if(this.enemy.length>0){
+        if (this.enemy.length > 0) {
             this.enemy[0].enemy.effects.forEach(effect => {
-                if(effect.type === EFFECT_ATTACK){
+                if (effect.type === EFFECT_ATTACK) {
                     enemyTotalDamage += effect.value;
-                } else if(effect.type === EFFECT_DEFENSE){
+                } else if (effect.type === EFFECT_DEFENSE) {
                     enemyTotalDefense += effect.value;
-                } else if (effect.type === EFFECT_REGENERATION){
+                } else if (effect.type === EFFECT_REGENERATION) {
                     enemyTotalRegeneration += effect.value;
                 }
             });
             this.enemy[0].enemy.damage += Math.max(playerTotalDamage - enemyTotalDefense, 0);
-            if(this.enemy[0].enemy.damage >= this.enemy[0].enemy.hitPoints){
+            game.player.stats.damageDealt += Math.min(playerTotalDamage - enemyTotalDefense, 0);
+            if (this.enemy[0].enemy.damage >= this.enemy[0].enemy.hitPoints) {
+                game.player.stats.enemiesKilled++;
                 this.enemy[0].enemy.damage = 0;
                 this.enemy[0].flipped = false;
                 game.areas.loot.add(this.enemy.shift());
@@ -115,6 +117,7 @@ export default class EnemyArea extends PlayArea {
             }
             this.enemy[0].enemy.damage = Math.max(this.enemy[0].enemy.damage - enemyTotalRegeneration, 0);
         }
+        game.player.stats.damageBlocked += Math.min(playerTotalDefense, enemyTotalDamage);
         game.player.damage += Math.max(enemyTotalDamage - playerTotalDefense, 0);
         game.player.damage = Math.max(game.player.damage - playerTotalRegeneration, 0);
     }

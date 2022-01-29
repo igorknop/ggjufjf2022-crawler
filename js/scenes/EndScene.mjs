@@ -71,7 +71,7 @@ export default class EndScene {
     this.ctx.fillText(
       `GAME OVER!`,
       this.canvas.width / 2,
-      this.canvas.height * 0.4
+      this.canvas.height * 0.1
     );
     fontSize = 0.026785714285714284 * this.canvas.height;
     this.ctx.font = `${fontSize}px 'Orbitron'`;
@@ -82,12 +82,12 @@ export default class EndScene {
       if (message.indexOf("-") >= 0) {
         this.ctx.fillStyle = "red";
       } else {
-        this.ctx.fillStyle = "hsl(0,0%,20%)";
+        this.ctx.fillStyle = "hsl(0deg, 0%, 100%)";
       }
       this.ctx.fillText(
         message,
         0.85 * this.canvas.width,
-        (0.46 + i * 0.04) * this.canvas.height
+        (0.2 + i * 0.04) * this.canvas.height
       );
     }
     requestAnimationFrame((t) => {
