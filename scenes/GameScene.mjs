@@ -1,9 +1,11 @@
 import Area from "../Area.mjs";
+import EnemyArea from "../areas/EnemyArea.mjs";
 import Button from "../Button.mjs";
 import Card from "../Card.mjs";
 import CrawlerCard from "../CrawlerCard.mjs";
 import { ALL_AVAILABLE } from "../data/AllCards.mjs";
 import { GAME_TIME } from "../data/AllTimeConstants.mjs";
+import { CARDS_GIANT_RAT } from "../data/CardsGiantRat.mjs";
 import PlayArea from "../PlayArea.mjs";
 import Ready from "../Ready.mjs";
 import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
@@ -187,39 +189,37 @@ export default class GameScene {
     );
     this.areas.deck.loadAll(ALL_AVAILABLE.map((c) => new CrawlerCard(c)));
     this.endTurn();
-    this.areas.enemies = [];
-    this.areas.enemies.push(
-      new PlayArea(
-        {
-          x: 0.5 * this.canvas.width / 3,
-          y: 0.25 * this.canvas.height,
-          w: this.canvas.width / 3,
-          h: this.canvas.height / 3,
-          type: 0,
-        }
-      )
-    );
-    this.areas.enemies.push(
-      new PlayArea(
+    this.areas.enemies = [
+      new EnemyArea(
+      {
+        x: 0.5 * this.canvas.width / 3,
+        y: 0.25 * this.canvas.height,
+        w: this.canvas.width / 3,
+        h: this.canvas.height / 3,
+        type: 0,
+        enemy: CARDS_GIANT_RAT.map(c => new CrawlerCard(c)),
+      }),
+      new EnemyArea(
         {
           x: 1.5 * this.canvas.width / 3,
           y: 0.25 * this.canvas.height,
           w: this.canvas.width / 3,
           h: this.canvas.height / 3,
-          type: 0
+          type: 0,
+          enemy: CARDS_GIANT_RAT.map(c => new CrawlerCard(c)),
         }
-      )
-    );
-    this.areas.enemies.push(
-      new PlayArea(
+      ),
+      new EnemyArea(
         {
           x: 2.5 * this.canvas.width / 3,
           y: 0.25 * this.canvas.height,
           w: this.canvas.width / 3,
           h: this.canvas.height / 3,
-        }
-      )
-    );
+          type: 0,
+          enemy: CARDS_GIANT_RAT.map(c => new CrawlerCard(c)),
+        }),
+    ];
+
     this.areas.buildings = [];
     this.newTurn = new Button(
       0.85 * this.canvas.width,
@@ -270,11 +270,11 @@ export default class GameScene {
     if (this.playedCard !== null) {
       this.playedCard.x = x;
       this.playedCard.y = y;
-      this.areas.enemies.forEach((enemy) => {
+      this.areas.enemies.forEach((enemyArea) => {
         // const checked = enemy.check(x, y);
-        if (enemy.hasPoint({ x, y })) {
-          enemy.cards.push(this.playedCard);
-          this.areas.hand.delete(this.playedCard);
+        if (enemyArea.hasPoint({ x, y })) {
+          this.areas.hand.delete(this.playedCard)
+          enemyArea.add(this.playedCard);
         }
         // if (checked) {
         //   if (!checked.deliver(this.dragging.type)) {

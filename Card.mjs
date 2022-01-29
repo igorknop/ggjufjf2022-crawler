@@ -29,4 +29,8 @@ export default class Card extends Sprite {
     ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
     ctx.fillText(this.text, this.x, this.y + this.w * 0.04);
   }
+
+  getHint(){
+    return this.text;
+  }
 }
