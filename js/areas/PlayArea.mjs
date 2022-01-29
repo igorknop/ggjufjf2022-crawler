@@ -23,7 +23,7 @@ export default class PlayArea extends Sprite {
   }
   draw(ctx) {
     ctx.strokeStyle = FRONT_COLOR;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 1;
     ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
     ctx.lineWidth = 1;
     const r = 0.07;

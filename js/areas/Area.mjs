@@ -41,9 +41,8 @@ export default class Area {
   draw(ctx) {
     if (!this.visible) return;
     ctx.strokeStyle = FRONT_COLOR;
-    ctx.lineWidth = 3;
-    ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
     ctx.lineWidth = 1;
+    ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
     ctx.font = "15px 'Orbitron'";
     ctx.fillStyle = FRONT_COLOR;
     ctx.fillText(this.title, this.x, this.y);

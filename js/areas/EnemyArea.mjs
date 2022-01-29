@@ -28,9 +28,8 @@ export default class EnemyArea extends PlayArea {
 
     draw(ctx) {
         ctx.strokeStyle = FRONT_COLOR;
-        ctx.lineWidth = 3;
-        ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
         ctx.lineWidth = 1;
+        ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
 
         if (this.enemy.length > 0) {
             this.enemy[0].draw(ctx);

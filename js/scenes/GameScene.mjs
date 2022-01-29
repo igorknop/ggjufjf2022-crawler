@@ -66,13 +66,18 @@ export default class GameScene {
 
   setup() {
     this.expire = GAME_TIME;
-    this.grace = 5;
-    this.reputation = 5;
     this.playedCard = null;
     this.t0 = null;
     this.dt = null;
     this.areas = {};
     const touches = [];
+    this.player = {
+      hitPoints: 5,
+      damage: 0,
+      monstersKilled: 0,
+      coins: 0,
+    }
+
     this.createAreas();
     this.animID = null;
 
@@ -121,6 +126,7 @@ export default class GameScene {
     this.areas.trash.draw(this.ctx);
     this.areas.deck.draw(this.ctx);
     this.areas.discard.draw(this.ctx);
+    this.areas.loot.draw(this.ctx);
 
     this.newTurn.draw(this.ctx);
     this.showDiscard.draw(this.ctx);
@@ -142,10 +148,10 @@ export default class GameScene {
       0.05 * this.canvas.height
     );
     this.drawHud(this.ctx);
-    // if (this.areas.hand.cards.length === 0) {
-    //   this.endTurn();
-    // }
-    if (this.expire <= 0) {
+    if (this.areas.hand.cards.length === 0) {
+      this.endTurn();
+    }
+    if (this.expire <= 0 || (this.player.damage > this.player.hitPoints)) {
       //cancelAnimationFrame(this.animID);
       this.game.setScene("end");
       return;
@@ -193,7 +199,16 @@ export default class GameScene {
         y: 0.9153571428571429 * this.canvas.height,
         visible: false,
         w: this.canvas.width * (4 / 5),
+      }
+    );
 
+    this.areas.loot = new Area(
+      {
+        title: "Loot",
+        x: this.canvas.width / 2,
+        y: 0.55 * this.canvas.height,
+        visible: true,
+        w: this.canvas.width * (4 / 5),
       }
     );
 
@@ -231,32 +246,32 @@ export default class GameScene {
 
     this.areas.buildings = [];
     this.newTurn = new Button(
-      0.85 * this.canvas.width,
-      0.58 * this.canvas.height,
-      0.25625 * this.canvas.width,
-      0.07 * this.canvas.height,
+      this.canvas.width * (0 + 4 / 4 - 1 / 8),
+      0.83 * this.canvas.height,
+      0.21875 * this.canvas.width,
+      0.045 * this.canvas.height,
       "End Turn",
       false
     );
     this.showDeck = new Button(
-      this.canvas.width * (0 + 1 / 3 - 1 / 5),
-      0.82 * this.canvas.height,
+      this.canvas.width * (0 + 2 / 4 - 1 / 8),
+      0.83 * this.canvas.height,
       0.21875 * this.canvas.width,
-      0.043 * this.canvas.height,
+      0.045 * this.canvas.height,
       "Deck",
       false
     );
     this.showDiscard = new Button(
-      this.canvas.width * (2 / 3 - 1 / 5),
-      0.82 * this.canvas.height,
+      this.canvas.width * (3 / 4 - 1 / 8),
+      0.83 * this.canvas.height,
       0.21875 * this.canvas.width,
       0.045 * this.canvas.height,
       "Discard",
       false
     );
     this.showTrash = new Button(
-      this.canvas.width * (3 / 3 - 1 / 5),
-      0.82 * this.canvas.height,
+      this.canvas.width * (1 / 4 - 1 / 8),
+      0.83 * this.canvas.height,
       0.21875 * this.canvas.width,
       0.045 * this.canvas.height,
       "Trash",
@@ -372,7 +387,7 @@ export default class GameScene {
 
   }
 
-  refillPlayerHand(){
+  refillPlayerHand() {
     if (this.areas.deck.size() <= 5) {
       this.areas.hand.addAll(this.areas.deck);
       this.areas.deck.addAll(this.areas.discard);
