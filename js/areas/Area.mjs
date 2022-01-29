@@ -43,7 +43,8 @@ export default class Area {
     ctx.strokeStyle = FRONT_COLOR;
     ctx.lineWidth = 1;
     ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
-    ctx.font = "15px 'Orbitron'";
+    let fontSize = 0.025 * ctx.canvas.width;
+    ctx.font = `${fontSize}px "Orbitron"`;
     ctx.fillStyle = FRONT_COLOR;
     ctx.fillText(this.title, this.x, this.y);
     this.cards.forEach((p) => {
@@ -86,7 +87,7 @@ export default class Area {
   drawCount(ctx) {
     if (!this.visible) return;
     let counts = this.countPeople();
-    let fontSize = 0.04 * ctx.canvas.height;
+    let fontSize = 0.025 * ctx.canvas.width;
     ctx.font = `${fontSize}px 'Skranji'`;
     ctx.fillStyle = "yellow";
     ctx.strokeStyle = "black";

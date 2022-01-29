@@ -26,6 +26,8 @@ export default class Card extends Sprite {
     ctx.strokeStyle = FRONT_COLOR;
     ctx.fillStyle = FRONT_COLOR;
     ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+    let fontSize = 0.025 * ctx.canvas.width;
+    ctx.font = `${fontSize}px "Orbitron"`;
     ctx.fillText(this.text, this.x, this.y + this.w * 0.04);
   }
 

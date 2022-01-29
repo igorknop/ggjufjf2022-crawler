@@ -4,7 +4,7 @@ import Button from "../Button.mjs";
 import Card from "../Card.mjs";
 import CrawlerCard from "../CrawlerCard.mjs";
 import { ALL_AVAILABLE } from "../../data/AllCards.mjs";
-import { GAME_TIME } from "../../data/AllTimeConstants.mjs";
+import { CARDS_IN_HAND, GAME_TIME } from "../../data/AllTimeConstants.mjs";
 import { CARDS_GIANT_RAT } from "../../data/cards/CardsGiantRat.mjs";
 import { CARDS_SLIME } from "../../data/cards/CardsSlime.mjs";
 import PlayArea from "../areas/PlayArea.mjs";
@@ -77,6 +77,7 @@ export default class GameScene {
       monstersKilled: 0,
       coins: 0,
     }
+    this.loot = [];
 
     this.createAreas();
     this.animID = null;
@@ -117,6 +118,8 @@ export default class GameScene {
     this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
 
     //this.areas.cardCount.draw(this.ctx);
+    const fontSize = 0.025 * this.ctx.canvas.width;
+    this.ctx.font = `${fontSize}px "Orbitron"`;
     this.areas.enemies.forEach((e) => {
       e.draw(this.ctx);
     });
@@ -141,17 +144,17 @@ export default class GameScene {
     this.ctx.fillStyle =
       this.expire > 30
         ? FRONT_COLOR
-        : `hsl(0deg, 100%, ${(1 - this.expire / 30) * 50}%`;
+        : `hsl(0deg, 100%, ${(1 - (30 - this.expire) / 30) * 50}%`;
     this.ctx.fillText(
       `${min}:${seg}`,
       0.5 * this.canvas.width,
       0.05 * this.canvas.height
     );
     this.drawHud(this.ctx);
-    if (this.areas.hand.cards.length === 0) {
-      this.endTurn();
-    }
-    if (this.expire <= 0 || (this.player.damage > this.player.hitPoints)) {
+    // if (this.areas.hand.cards.length === 0) {
+    //   this.endTurn();
+    // }
+    if (this.expire <= 0 || (this.player.damage >= this.player.hitPoints)) {
       //cancelAnimationFrame(this.animID);
       this.game.setScene("end");
       return;
@@ -380,19 +383,24 @@ export default class GameScene {
 
   endTurn() {
     this.areas.enemies.forEach((enemyArea) => {
-      enemyArea.resolveEffects(this);
+      enemyArea.resolveEffects(this);  
     });
-
-    //this.areas.discard.addAll(this.areas.hand);
+    this.areas.discard.addAll(this.areas.hand);
+    this.areas.enemies.forEach((enemyArea) => {
+      this.areas.discard.cards = [...this.areas.discard.cards, ...enemyArea.cards];
+      enemyArea.cards = [];
+    });
+    this.areas.discard.updatePositions();
+    this.refillPlayerHand();
 
   }
 
   refillPlayerHand() {
-    if (this.areas.deck.size() <= 5) {
+    if (this.areas.deck.size() <= CARDS_IN_HAND) {
       this.areas.hand.addAll(this.areas.deck);
       this.areas.deck.addAll(this.areas.discard);
     }
-    while (this.areas.hand.size() < 5 && this.areas.deck.size() > 0) {
+    while (this.areas.hand.size() < CARDS_IN_HAND && this.areas.deck.size() > 0) {
       const r = Math.floor(Math.random() * this.areas.deck.size());
       const p = this.areas.deck.cards[r];
       this.areas.hand.add(p);
