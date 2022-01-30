@@ -1,5 +1,6 @@
 import Sprite from "./Sprite.mjs";
 import { assets } from "./Game.mjs";
+import { BUTTON_BACKGROUND_COLOR, BUTTON_TEXT_COLOR } from "./util/Colors.mjs";
 
 export default class Button extends Sprite {
   constructor(x, y, w, h, text, useImage = true) {
@@ -14,7 +15,7 @@ export default class Button extends Sprite {
   draw(ctx) {
     ctx.beginPath();
     let fontSize = 0.022 * ctx.canvas.height;
-    ctx.font = `${fontSize}px 'Skranji'`;
+    ctx.font = `${fontSize}px 'Orbitron'`;  
     if (this.useImage) {
       ctx.drawImage(
         assets.img("button"),
@@ -24,9 +25,9 @@ export default class Button extends Sprite {
         this.h * 1.9
       );
     } else {
-      ctx.fillStyle = "hsl(42 100% 50% / 1)";
+      ctx.fillStyle = BUTTON_BACKGROUND_COLOR;
       ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
-      ctx.strokeStyle = "hsl(28deg 100% 40%)";
+      ctx.strokeStyle = BUTTON_TEXT_COLOR;
       ctx.lineWidth = 2;
       ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
     }

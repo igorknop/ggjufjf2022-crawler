@@ -1,7 +1,7 @@
-import Activity from "./Activity.mjs";
-import People from "./People.mjs";
-import { shuffleArray } from "./util/shuffle.mjs";
-import { PH, PW } from "./data/AllTimeConstants.mjs";
+import Activity from "../Activity.mjs";
+import People from "../People.mjs";
+import { shuffleArray } from "../util/shuffle.mjs";
+import { CARD_H, CARD_W } from "../data/AllTimeConstants.mjs";
 
 export const REPUTATION = 4;
 export const SPAWN = 60.0;
@@ -23,7 +23,7 @@ export default class Activities {
   loadAll(activities, canvas) {
     activities.forEach((s) => {
       for (let c = 0; c < s.qty; c++) {
-        this.add(new Activity({ ...s, PW, PH }));
+        this.add(new Activity({ ...s, CARD_W, CARD_H }));
       }
     });
     this.shuffle();

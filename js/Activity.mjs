@@ -1,6 +1,6 @@
-import { TYPE_COLOR , FAST, PH } from "./data/AllTimeConstants.mjs";
+import { TYPE_COLOR , FAST, CARD_H } from "../data/AllTimeConstants.mjs";
 import { assets } from "./Game.mjs";
-import Sprite from "./Sprite.mjs";
+import Sprite from "../Sprite.mjs";
 
 export default class Activity extends Sprite {
   constructor({
@@ -8,8 +8,8 @@ export default class Activity extends Sprite {
     type = 0,
     expire = FAST,
     effect = () => {},
-    w = PH*1.7,
-    h = PH*1.7,
+    w = CARD_H*1.7,
+    h = CARD_H*1.7,
   }) {
     super({});
     this.type = type;

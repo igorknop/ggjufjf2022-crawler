@@ -1,5 +1,6 @@
 import Button from "./Button.mjs";
 import { assets } from "./Game.mjs";
+import { BUTTON_BACKGROUND_COLOR, BUTTON_TEXT_COLOR } from "./util/Colors.mjs";
 
 export default class NextTurnButton extends Button {
   constructor(x, y, w, h, text, useImage = true) {
@@ -16,9 +17,9 @@ export default class NextTurnButton extends Button {
         this.h * 1
       );
     } else {
-      ctx.fillStyle = "hsl(42 100% 50% / 1)";
+      ctx.fillStyle = BUTTON_BACKGROUND_COLOR;
       ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
-      ctx.strokeStyle = "hsl(28deg 100% 40%)";
+      ctx.strokeStyle = BUTTON_TEXT_COLOR;
     }
   }
 }

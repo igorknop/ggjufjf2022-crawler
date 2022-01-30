@@ -1,11 +1,12 @@
 import Button from "../Button.mjs";
+import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
 
-export default class EndScene {
-  constructor(canvas) {
+export default class StartScene {
+  constructor(canvas, ctx) {
     this.canvas = canvas;
-    this.ctx = this.canvas.getContext("2d");
-    this.expire = 2;
+    this.ctx = ctx;
+    this.expire = 1;
     this.grace = 5;
     this.reputation = 5;
     this.dragging = null;
@@ -22,7 +23,7 @@ export default class EndScene {
   }
   stop() {}
   setup() {
-    this.expire = 2;
+    this.expire = 1;
     this.canvas.onmousedown = (e) => {
       this.mousedown(e);
     };
@@ -52,49 +53,30 @@ export default class EndScene {
   step(t) {
     this.t0 = this.t0 ?? t;
     this.dt = (t - this.t0) / 1000;
-    this.expire += (this.expire > 0) ? -1 * this.dt : 0;
-    this.ctx.fillStyle = "hsl(200, 7%, 84%)";
+    this.expire += this.expire > 0 ? -1 * this.dt : 0;
+    this.ctx.fillStyle = BACKGROUND_COLOR;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.strokeStyle = "hsl(200, 7%, 74%)";
+    this.ctx.strokeStyle = FRONT_COLOR;
     this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.drawImage(
-      this.assets.img("menuBg"),
-      0,
-      0,
-      this.canvas.width,
-      this.canvas.height
-    );
     
-    if (this.expire <= 0) {
-      this.mainMenu.draw(this.ctx);
-      this.newGame.draw(this.ctx);
-    };
-    this.ctx.fillStyle = "black";
-    let fontSize = 0.07142857142857142 * this.canvas.height;
-    this.ctx.font = `${fontSize}px 'Skranji'`;
-    this.ctx.textAlign = "center";
-    this.ctx.fillText(
-      `GAME OVER!`,
-      this.canvas.width / 2,
-      this.canvas.height * 0.4
-    );
-    fontSize = 0.026785714285714284 * this.canvas.height;
-    this.ctx.font = `${fontSize}px 'Skranji'`;
-    this.ctx.textAlign = "right";
 
-    for (let i = this.game.messages.length - 1; i >= 0; i--) {
-      const message = this.game.messages[i];
-      if (message.indexOf("-") >= 0) {
-        this.ctx.fillStyle = "red";
-      } else {
-        this.ctx.fillStyle = "hsl(0,0%,20%)";
-      }
+    if (this.assets.progresso() < 100 || this.expire > 0) {
+      let fontSize = 0.03571428571428571 * this.canvas.height;
+      this.ctx.font = `${fontSize}px 'Orbitron'`;
+      this.ctx.textAlign = "center";
+      this.ctx.fillStyle = FRONT_COLOR;
       this.ctx.fillText(
-        message,
-        0.85 * this.canvas.width,
-        (0.46 + i * 0.04) * this.canvas.height
+        `Loading... ${this.assets.progresso()}%`,
+        0.5 * this.canvas.width,
+        0.56 * this.canvas.height,
+        this.canvas.width
       );
+    } else {
+      this.newGame.draw(this.ctx);
+      this.credits.draw(this.ctx);
+      this.rules.draw(this.ctx);
     }
+
     requestAnimationFrame((t) => {
       this.step(t);
     });
@@ -107,34 +89,45 @@ export default class EndScene {
       0.7 * this.canvas.height,
       0.3 * this.canvas.width,
       0.07 * this.canvas.height,
-      "New Game"
+      "New Game",
+      false
     );
-    this.mainMenu = new Button(
+    this.rules = new Button(
       0.5 * this.canvas.width,
       0.8 * this.canvas.height,
       0.3 * this.canvas.width,
       0.07 * this.canvas.height,
-      "Main Menu"
+      "How to Play",
+      false
+    );
+    this.credits = new Button(
+      0.5 * this.canvas.width,
+      0.9 * this.canvas.height,
+      0.3 * this.canvas.width,
+      0.07 * this.canvas.height,
+      "Credits",
+      false
     );
   }
 
   mousedown(e) {
-    if (this.expire > 0) return;
+    if (this.assets.progresso() < 100.0 || this.expire > 0) {
+      return;
+    }
     const [x, y] = getXY(e, this.canvas);
-
     if (this.newGame.hasPoint({ x, y })) {
       this.game.setScene("game");
     }
-    if (this.mainMenu.hasPoint({ x, y })) {
-      this.game.setScene("start");
+    if (this.credits.hasPoint({ x, y })) {
+      this.game.setScene("credits");
+    }
+    if (this.rules.hasPoint({ x, y })) {
+      this.game.setScene("rules");
     }
   }
   mouseup(e) {}
   click(e) {
-    const [x, y] = getXY(e, this.canvas);
-
-    if (this.newGame.hasPoint({ x, y })) {
-    }
+    this.mousedown(e);
   }
   mousemove(e) {}
   mouseout(e) {}
