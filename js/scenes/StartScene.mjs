@@ -129,12 +129,15 @@ export default class StartScene {
     const [x, y] = getXY(e, this.canvas);
     if (this.newGame.hasPoint({ x, y })) {
       this.game.setScene("game");
+      this.game.assets.play("click");
     }
     if (this.credits.hasPoint({ x, y })) {
       this.game.setScene("credits");
+      this.game.assets.play("click");
     }
     if (this.rules.hasPoint({ x, y })) {
       this.game.setScene("rules");
+      this.game.assets.play("click");
     }
   }
   mouseup(e) { }

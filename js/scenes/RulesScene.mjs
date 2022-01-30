@@ -113,6 +113,7 @@ export default class RulesScene {
     const [x,y] = getXY(e, this.canvas);
 
     if (this.mainMenu.hasPoint({ x, y })) {
+      this.game.assets.play("click");
       this.game.setScene("start");
     }
   }

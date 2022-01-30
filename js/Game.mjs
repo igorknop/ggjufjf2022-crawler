@@ -6,7 +6,10 @@ import RulesScene from "./scenes/RulesScene.mjs";
 import AssetManager from "./AssetManager.mjs";
 import { setCardSize } from "../data/AllTimeConstants.mjs";
 
+
 export const assets = new AssetManager();
+assets.loadAudio(`damage`, "./assets/hit.wav");
+assets.loadAudio(`click`, "./assets/click.wav");
 
 
 

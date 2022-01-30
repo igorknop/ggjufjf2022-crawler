@@ -350,6 +350,7 @@ export default class GameScene {
       return;
     }
     if (this.newTurn.hasPoint({ x, y })) {
+      this.game.assets.play("click");
       this.areas.loot.visible = true;
       this.areas.deck.visible = false;
       this.areas.discard.visible = false;
@@ -357,18 +358,21 @@ export default class GameScene {
       this.endTurn();
     }
     if (this.showDeck.hasPoint({ x, y })) {
+      this.game.assets.play("click");
       this.areas.loot.visible = !this.areas.loot.visible;
       this.areas.deck.visible = !this.areas.deck.visible;
       this.areas.discard.visible = false;
       this.areas.trash.visible = false;
     }
     if (this.showDiscard.hasPoint({ x, y })) {
+      this.game.assets.play("click");
       this.areas.loot.visible = !this.areas.loot.visible;
       this.areas.deck.visible = false;
       this.areas.discard.visible = !this.areas.discard.visible;
       this.areas.trash.visible = false;
     }
     if (this.showTrash.hasPoint({ x, y })) {
+      this.game.assets.play("click");
       this.areas.loot.visible = !this.areas.loot.visible;
       this.areas.deck.visible = false;
       this.areas.discard.visible = false;
