@@ -89,6 +89,11 @@ export default class EnemyArea extends PlayArea {
 
         this.cards.forEach(card => {
             card.player.effects.forEach(effect => {
+                if(effect.req) {
+                    if(!isSuperset(new Set(card.cardsUnder.flatMap(c=>c.player.set)), new Set(effect.req))) {
+                        return;
+                    }
+                }
                 if (effect.type === EFFECT_ATTACK) {
                     playerTotalDamage += effect.value;
                 } else if (effect.type === EFFECT_DEFENSE) {
@@ -100,6 +105,7 @@ export default class EnemyArea extends PlayArea {
         });
         if (this.enemy.length > 0) {
             this.enemy[0].enemy.effects.forEach(effect => {
+
                 if (effect.type === EFFECT_ATTACK) {
                     enemyTotalDamage += effect.value;
                 } else if (effect.type === EFFECT_DEFENSE) {
@@ -109,9 +115,9 @@ export default class EnemyArea extends PlayArea {
                 }
             });
             this.enemy[0].enemy.damage += Math.max(playerTotalDamage - enemyTotalDefense, 0);
-            game.player.stats.damageDealt += Math.min(playerTotalDamage - enemyTotalDefense, 0);
+            game.player.stats.damageDealt += Math.max(playerTotalDamage - enemyTotalDefense, 0);
             if (this.enemy[0].enemy.damage >= this.enemy[0].enemy.hitPoints) {
-                game.player.stats.enemiesKilled++;
+                game.player.stats.monstersKilled++;
                 this.enemy[0].enemy.damage = 0;
                 this.enemy[0].flipped = false;
                 game.areas.loot.add(this.enemy.shift());
@@ -132,4 +138,13 @@ export default class EnemyArea extends PlayArea {
             }
         }
     }
+}
+
+function isSuperset(set, subset) {
+    for (var elem of subset) {
+        if (!set.has(elem)) {
+            return false;
+        }
+    }
+    return true;
 }
