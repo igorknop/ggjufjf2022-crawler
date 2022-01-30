@@ -141,7 +141,7 @@ export default class EnemyArea extends PlayArea {
                 const totalHealed = Math.min(this.enemy[0].enemy.damage, enemyTotalRegeneration);
                 this.enemy[0].enemy.damage = Math.max(this.enemy[0].enemy.damage - enemyTotalRegeneration, 0);
                 if (totalHealed > 0) {
-                    scene.particles.heal(this.enemy[0].x - fontSize * 1.3 * p, this.enemy[0].y);
+                    scene.particles.heal(this.enemy[0].x - fontSize * 1.3 , this.enemy[0].y);
                     scene.assets.play("heal");
                 }
             }

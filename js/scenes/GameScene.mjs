@@ -9,6 +9,7 @@ import getXY from "../util/getXY.mjs";
 import generateLevel1 from "../../data/cards/Level1.mjs";
 import { CARDS_GIANT_RATS } from "../../data/cards/CardsGiantRat.mjs";
 import ParticleManager from "../util/Particles.mjs";
+import { shuffleArray } from "../util/shuffle.mjs";
 
 export default class GameScene {
   constructor(canvas, ctx) {
@@ -459,13 +460,12 @@ export default class GameScene {
 
   refillPlayerHand() {
     let cardsDrawned = 0;
-    if (this.areas.deck.size() <= Math.min(this.player.stamina - this.areas.hand.size(), this.player.staminaRegen)) {
-      cardsDrawned += this.areas.deck.size();
-      this.areas.hand.addAll(this.areas.deck);
-      this.areas.deck.addAll(this.areas.discard);
-    }
 
     while (this.areas.deck.size() > 0 && cardsDrawned < this.player.staminaRegen && this.areas.hand.size() < this.player.stamina) {
+      if(this.areas.deck.size() > 0) {
+        this.areas.deck.addAll(this.areas.discard);
+        this.areas.deck.cards = shuffleArray(this.areas.deck.cards);
+      }
       const r = Math.floor(Math.random() * this.areas.deck.size());
       const p = this.areas.deck.cards[r];
       this.areas.hand.add(p);
