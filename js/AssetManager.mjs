@@ -38,9 +38,9 @@ export default class AssetManager {
   }
 
   progresso() {
-    if (this.aCarregar != 0) {
+    if (this.aCarregar > 0) {
       return (this.carregadas / this.aCarregar) * 100.0;
-    } else return 0.0;
+    } else return 100.0;
   }
 
   loadAudio(key, url) {

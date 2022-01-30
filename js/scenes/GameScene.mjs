@@ -2,7 +2,7 @@ import Area from "../areas/Area.mjs";
 import EnemyArea from "../areas/EnemyArea.mjs";
 import Button from "../Button.mjs";
 import CrawlerCard from "../CrawlerCard.mjs";
-import { CARDS_IN_HAND, GAME_TIME } from "../../data/AllTimeConstants.mjs";
+import { STARTING_CARDS_IN_HAND, GAME_TIME, STARTING_STAMINA_REGEN } from "../../data/AllTimeConstants.mjs";
 import Ready from "../areas/Ready.mjs";
 import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
@@ -16,15 +16,13 @@ export default class GameScene {
     this.canvas = canvas;
     this.ctx = ctx;
     this.player = createPlayerData();
-    this.grace = 5;
-    this.reputation = 5;
     this.playedCard = null;
     this.t0 = null;
     this.dt = null;
     this.areas = {};
     const touches = [];
     this.animID = null;
-    this.currentLevel = generateLevel1();
+    this.currentLevel = [];
     this.createAreas();
   }
   start() {
@@ -71,11 +69,17 @@ export default class GameScene {
     this.areas = {};
     const touches = [];
     this.player = createPlayerData();
-    this.loot = [];
+
 
     this.currentLevel = generateLevel1();
-
     this.createAreas();
+    this.areas.deck.loadAll(CARDS_GIANT_RATS.map((c) => new CrawlerCard(c)));
+    while (this.areas.hand.size() < this.player.stamina) {
+      this.refillPlayerHand();
+    }
+    this.areas.enemies[1].enemy.push(this.currentLevel.shift());
+    this.areas.enemies[1].updatePositions();
+
     this.animID = null;
 
     this.canvas.onmousedown = (e) => {
@@ -213,7 +217,6 @@ export default class GameScene {
       }
     );
 
-    this.areas.deck.loadAll(CARDS_GIANT_RATS.map((c) => new CrawlerCard(c)));
     this.areas.enemies = [
       new EnemyArea(
         {
@@ -222,7 +225,7 @@ export default class GameScene {
           w: this.canvas.width / 3,
           h: this.canvas.height / 3,
           type: 0,
-          enemy: [this.currentLevel.shift()],
+          enemy: [],
           source: this.currentLevel,
           trigger: 5,
         }),
@@ -233,7 +236,7 @@ export default class GameScene {
           w: this.canvas.width / 3,
           h: this.canvas.height / 3,
           type: 0,
-          enemy: [this.currentLevel.shift()],
+          enemy: [],
           source: this.currentLevel,
           trigger: 3,
         }
@@ -245,7 +248,7 @@ export default class GameScene {
           w: this.canvas.width / 3,
           h: this.canvas.height / 3,
           type: 0,
-          enemy: [this.currentLevel.shift()],
+          enemy: [],
           source: this.currentLevel,
           trigger: 4,
         }),
@@ -311,7 +314,7 @@ export default class GameScene {
             if (enemyArea.cards[i].hasPoint({ x, y })) {
               overAnother = true;
               enemyArea.cards[i].cardsUnder.push(this.playedCard);
-              this.areas.hand.delete(this.playedCard);  
+              this.areas.hand.delete(this.playedCard);
               this.playedCard.x = enemyArea.cards[i].x;
               this.playedCard.y = enemyArea.cards[i].y + 8 * enemyArea.cards[i].cardsUnder.length;
               this.playedCard = null;
@@ -420,40 +423,46 @@ export default class GameScene {
     this.areas.enemies.forEach((enemyArea) => {
       enemyArea.resolveEffects(this);
     });
-    this.areas.discard.addAll(this.areas.hand);
+
     this.areas.enemies.forEach((enemyArea) => {
-      
-      this.areas.discard.cards = [...this.areas.discard.cards, ...enemyArea.cards, ...enemyArea.cards.flatMap(c=>c.cardsUnder)];
-      enemyArea.cards.forEach(c=>{c.cardsUnder = [];});
+
+      this.areas.discard.cards = [...this.areas.discard.cards, ...enemyArea.cards, ...enemyArea.cards.flatMap(c => c.cardsUnder)];
+      enemyArea.cards.forEach(c => { c.cardsUnder = []; });
       enemyArea.cards = [];
     });
     this.areas.discard.updatePositions();
+
     this.refillPlayerHand();
 
   }
 
   refillPlayerHand() {
-    if (this.areas.deck.size() <= CARDS_IN_HAND) {
+    let cardsDrawned = 0;
+    if (this.areas.deck.size() <= this.player.staminaRegen) {
+      cardsDrawned += this.areas.deck.size();
       this.areas.hand.addAll(this.areas.deck);
       this.areas.deck.addAll(this.areas.discard);
     }
-    while (this.areas.hand.size() < CARDS_IN_HAND && this.areas.deck.size() > 0) {
+
+    while (this.areas.deck.size()>0 && cardsDrawned < this.player.staminaRegen && this.areas.hand.size() < this.player.stamina) {
       const r = Math.floor(Math.random() * this.areas.deck.size());
       const p = this.areas.deck.cards[r];
       this.areas.hand.add(p);
       this.areas.deck.delete(p);
+      cardsDrawned++;
     }
   }
 
   drawHud(ctx) {
     ctx.fillStyle = FRONT_COLOR;
+    const fontSize = 0.025 * this.canvas.width;
     for (let h = 0; h < this.player.hitPoints; h++) {
-      ctx.fillRect(this.canvas.width * 0.10 + h * 12, this.canvas.height * 0.64, 10, 10);
+      ctx.fillRect(this.canvas.width * 0.10 + h * fontSize*1.3, this.canvas.height * 0.64, fontSize, fontSize);
     }
     ctx.fillStyle = FRONT_COLOR;
     for (let h = 0; h < this.player.damage; h++) {
       ctx.beginPath();
-      ctx.ellipse(this.canvas.width * 0.9 - h * 12, this.canvas.height * 0.647, 5, 5, 0, Math.PI * 2, false);
+      ctx.ellipse(this.canvas.width * 0.9 - h * fontSize*1.3, this.canvas.height * 0.647, fontSize/2, fontSize/2, 0, Math.PI * 2, false);
       ctx.fill();
       ctx.closePath();
     }
@@ -492,6 +501,8 @@ function padzero(num, places) {
 function createPlayerData() {
   return {
     hitPoints: 5,
+    stamina: STARTING_CARDS_IN_HAND,
+    staminaRegen: STARTING_STAMINA_REGEN,
     damage: 0,
     coins: 0,
 

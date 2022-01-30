@@ -22,7 +22,6 @@ export default class EnemyArea extends PlayArea {
         this.type = type;
         this.effect = effect;
         this.enemy = enemy;
-        this.updatePositions();
         this.cooldown = 0;
         this.trigger = trigger;
         this.source = source;
@@ -32,8 +31,10 @@ export default class EnemyArea extends PlayArea {
         let fontSize = 0.025 * ctx.canvas.width;
         ctx.font = `${fontSize}px 'Orbitron'`;
         ctx.strokeStyle = FRONT_COLOR;
+        ctx.fillStyle = FRONT_COLOR;
         ctx.lineWidth = 1;
         ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+        ctx.fillText(`${this.trigger-this.cooldown} ${this.enemy.length}`, this.x, this.y);
 
         if (this.enemy.length > 0) {
             this.enemy[0].draw(ctx);
