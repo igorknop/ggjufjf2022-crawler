@@ -49,13 +49,15 @@ export default class CrawlerCard extends Card {
         ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
         ctx.textAlign = "center";
         ctx.font = `${fontSize}px "Orbitron"`;
-        ctx.fillText(this.player.name, this.x, this.y - this.w * 0.46, this.w * 0.9);
+        ctx.fillText(this.player.name, this.x, this.y - this.h * 0.34, this.w * 0.9);
+        ctx.fillText(this.player.set.join(''), this.x, this.y - this.h * 0.2, this.w * 0.9);
         ctx.fillStyle = FRONT_COLOR;
         ctx.font = `${fontSize}px "Orbitron"`;
         for (let i = this.player.effects.length - 1; i >= 0; i--) {
             const effect = this.player.effects[i];
             ctx.fillText(`${effect.type} ${effect.value}`, this.x, this.y + this.w / 2 - i * 12, this.w * 0.9);
         };
+
     }
     drawAsEnemy(ctx) {
         let fontSize = 0.025 * ctx.canvas.width;
