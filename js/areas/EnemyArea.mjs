@@ -131,6 +131,9 @@ export default class EnemyArea extends PlayArea {
                     scene.particles.explode(this.enemy[0].x - fontSize * 1.3 * p, this.enemy[0].y);
                     scene.assets.play("damage");
                 }
+            } else {
+                scene.particles.block(this.enemy[0].x, this.enemy[0].y);
+                scene.assets.play("block");
             }
             if (this.enemy[0].enemy.damage >= this.enemy[0].enemy.hitPoints) {
                 scene.player.stats.monstersKilled++;
@@ -153,6 +156,9 @@ export default class EnemyArea extends PlayArea {
         if (damageInflictedToPlayer > 0) {
             scene.particles.explode(scene.ctx.canvas.width * 0.9 - scene.player.damage * fontSize * 1.3, scene.ctx.canvas.height * 0.655);
             scene.assets.play("damage");
+        } else if(enemyTotalDamage>0){
+            scene.assets.play("block");
+            scene.particles.block(scene.ctx.canvas.width * 0.9 - scene.player.damage * fontSize * 1.3, scene.ctx.canvas.height * 0.655);
         }
         if (scene.player.damage < scene.player.hitPoints) {
             const totalHealed = Math.min(scene.player.damage, playerTotalRegeneration);

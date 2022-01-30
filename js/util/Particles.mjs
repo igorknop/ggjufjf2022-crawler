@@ -48,6 +48,58 @@ export default class ParticleManager {
             this.particles.push(particle);
         }
     }
+    block(x, y, qty=30, ttl=0.25) {
+        for (let q = 0; q < qty/4; q++) {
+            const particle = {
+                ax: 200,
+                ay: -200,
+                x,
+                y,
+                vx:  200-Math.random()*100,
+                vy:  -200+Math.random()*100,
+                ttl,
+            };
+            this.particles.push(particle);
+        }
+        for (let q = 0; q < qty/4; q++) {
+            const particle = {
+                ax: -200,
+                ay: 200,
+                x,
+                y,
+                vx:  -200+Math.random()*100,
+                vy:  200-Math.random()*100,
+                ttl,
+            };
+            this.particles.push(particle);
+        }
+        for (let q = 0; q < qty/4; q++) {
+            const particle = {
+                ax: 200,
+                ay: 200,
+                x,
+                y,
+                vx:  200+Math.random()*100,
+                vy:  200-Math.random()*100,
+                ttl,
+            };
+            this.particles.push(particle);
+        }
+        for (let q = 0; q < qty/4; q++) {
+            const particle = {
+                ax: -200,
+                ay: -200,
+                x,
+                y,
+                vx:  -200+Math.random()*100,
+                vy:  -200-Math.random()*100,
+                ttl,
+            };
+            this.particles.push(particle);
+        }
+
+
+    }
     draw() {
         this.ctx.beginPath();
         for (let i = 0; i < this.particles.length; i++) {

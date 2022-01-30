@@ -14,6 +14,7 @@ assets.loadAudio(`die`, "./assets/gore.mp3");
 assets.loadAudio(`right`, "./assets/right.mp3");
 assets.loadAudio(`wrong`, "./assets/wrong.mp3");
 assets.loadAudio(`heal`, "./assets/heal.wav");
+assets.loadAudio(`block`, "./assets/block.wav");
 
 
 
