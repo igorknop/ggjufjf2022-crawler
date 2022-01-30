@@ -20,19 +20,19 @@ export const EFFECT_HEAL = 'heal';
 export const EFFECT_REST = 'rest';
 
 export const EFFECTS = {
-    EFFECT_ATTACK: {
+    ATTACK: {
         id: 'attack',
         name: 'Attack',
     },
-    EFFECT_DEFENSE: {
+    DEFENSE: {
         id: 'defense',
         name: 'Defense',
     },  
-    EFFECT_HEAL: {
+    HEAL: {
         id: 'heal',
         name: 'Heal',
     },
-    EFFECT_REST: {
+    REST: {
         id: 'rest',
         name: 'Rest',
     },
