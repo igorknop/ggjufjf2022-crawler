@@ -22,7 +22,7 @@ export default class StartScene {
       this.step(t);
     });
   }
-  stop() {}
+  stop() { }
   setup() {
     this.expire = 1;
     this.canvas.onmousedown = (e) => {
@@ -59,7 +59,7 @@ export default class StartScene {
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.strokeStyle = FRONT_COLOR;
     this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
-    
+
     if (this.assets.progresso() < 100 || this.expire > 0) {
       let fontSize = 0.03571428571428571 * this.canvas.height;
       this.ctx.font = `${fontSize}px 'Orbitron'`;
@@ -70,21 +70,23 @@ export default class StartScene {
         0.5 * this.canvas.width,
         0.56 * this.canvas.height,
         this.canvas.width
-        );
-      } else {
-        let fontSize = 0.1 * this.canvas.width;
-        this.ctx.fillStyle = FRONT_COLOR;
-        this.ctx.font = `${fontSize}px 'Orbitron'`;
-        writeText(this.ctx, "CRAWLER", 
-          0.5 * this.canvas.width, 
-          0.4 * this.canvas.height, 
-          this.canvas.width*0.8, 
-          2*fontSize
-          );
-        
-        this.newGame.draw(this.ctx);
-        this.credits.draw(this.ctx);
-        this.rules.draw(this.ctx);
+      );
+    } else {
+      let fontSize = 0.1 * this.canvas.width;
+      this.ctx.fillStyle = FRONT_COLOR;
+      this.ctx.textAlign = "center";
+
+      this.ctx.font = `${fontSize}px 'Orbitron'`;
+      writeText(this.ctx, "CRAWLER",
+        0.5 * this.canvas.width,
+        0.4 * this.canvas.height,
+        this.canvas.width * 0.8,
+        2 * fontSize
+      );
+
+      this.newGame.draw(this.ctx);
+      this.credits.draw(this.ctx);
+      this.rules.draw(this.ctx);
     }
 
     requestAnimationFrame((t) => {
@@ -135,12 +137,12 @@ export default class StartScene {
       this.game.setScene("rules");
     }
   }
-  mouseup(e) {}
+  mouseup(e) { }
   click(e) {
     this.mousedown(e);
   }
-  mousemove(e) {}
-  mouseout(e) {}
+  mousemove(e) { }
+  mouseout(e) { }
 
   touchstart(e) {
     const newTouch = e.changedTouches[0];
