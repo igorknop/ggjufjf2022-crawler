@@ -78,15 +78,15 @@ export default class RulesScene {
     this.ctx.font = `${fontSize}px 'Orbitron'`;
     this.ctx.textAlign ='left';
     let text = `You were thrown in the dungeon and must escape before time goes by.`;
-    writeText(this.ctx, text, 0.1*this.canvas.width, 0.39*this.canvas.height, 0.8*this.canvas.width, fontSize*2);   
+    writeText(this.ctx, text, 0.1*this.canvas.width, 0.33*this.canvas.height, 0.8*this.canvas.width, fontSize*2);   
     text = `Drag the cards to the enemies to fight them. Who receives many tokens equal to their hit points, die.`;
-    writeText(this.ctx, text, 0.1*this.canvas.width, 0.49*this.canvas.height, 0.8*this.canvas.width, fontSize*2);   
+    writeText(this.ctx, text, 0.1*this.canvas.width, 0.43*this.canvas.height, 0.8*this.canvas.width, fontSize*2);   
 
     text = `Dead monsters go to the loot pile as an item. You can choose a single card to add to your deck, and the others will turn into gold coins.`;
-    writeText(this.ctx, text, 0.1*this.canvas.width, 0.62*this.canvas.height, 0.8*this.canvas.width, fontSize*2);   
+    writeText(this.ctx, text, 0.1*this.canvas.width, 0.57*this.canvas.height, 0.8*this.canvas.width, fontSize*2);   
 
     text = `Use other cards as resources to boost strong effects.`;
-    writeText(this.ctx, text, 0.1*this.canvas.width, 0.75*this.canvas.height, 0.8*this.canvas.width, fontSize*2);   
+    writeText(this.ctx, text, 0.1*this.canvas.width, 0.74*this.canvas.height, 0.8*this.canvas.width, fontSize*2);   
 
 
     requestAnimationFrame((t) => {
