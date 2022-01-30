@@ -55,7 +55,11 @@ export default class CrawlerCard extends Card {
         ctx.font = `${fontSize}px "Orbitron"`;
         for (let i = this.player.effects.length - 1; i >= 0; i--) {
             const effect = this.player.effects[i];
-            ctx.fillText(`${effect.type} ${effect.value}`, this.x, this.y + this.w / 2 - i * 12, this.w * 0.9);
+            if(effect.req){
+                ctx.fillText(`${effect.req.join('')}: ${effect.type} ${effect.value}`, this.x, this.y + this.w / 2 - i * 12, this.w * 0.9);
+            } else{
+                ctx.fillText(`${effect.type} ${effect.value}`, this.x, this.y + this.w / 2 - i * 12, this.w * 0.9);
+            }
         };
 
     }
