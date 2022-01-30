@@ -1,6 +1,3 @@
-export const bg = new Image();
-bg.src = "./assets/gamejam.png";
-
 export default class AssetManager {
   constructor() {
     this.aCarregar = 0;
