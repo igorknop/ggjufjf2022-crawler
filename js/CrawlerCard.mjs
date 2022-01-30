@@ -1,17 +1,9 @@
-import Sprite from "./Sprite.mjs";
-import { TYPE_COLOR } from "../data/AllTimeConstants.mjs";
-import { assets } from "./Game.mjs";
 import { CARD_W } from "../data/AllTimeConstants.mjs";
 import { CARD_H } from "../data/AllTimeConstants.mjs";
 import { BACKGROUND_COLOR, FRONT_COLOR } from "./util/Colors.mjs";
 import Card from "./Card.mjs";
 
-const PEOPLE_IMAGES = [
-    { sx: 243, sy: 2279, sw: 276, sh: 364 },
-    { sx: 524, sy: 2279, sw: 276, sh: 364 },
-    { sx: 810, sy: 2279, sw: 276, sh: 364 },
-    { sx: 1096, sy: 2279, sw: 276, sh: 364 },
-];
+
 
 export default class CrawlerCard extends Card {
     constructor({ w = CARD_W, h = CARD_H, text = "Card ?", player, enemy, flipped, damage = 0, hitPoints = 0 }) {
@@ -64,12 +56,13 @@ export default class CrawlerCard extends Card {
         }
         ctx.fillStyle = FRONT_COLOR;
         ctx.font = `${fontSize}px "Orbitron"`;
-        for (let i = this.player.effects.length - 1; i >= 0; i--) {
+        const last = this.player.effects.length - 1;
+        for (let i = last; i >= 0; i--) {
             const effect = this.player.effects[i];
             if (effect.req) {
-                ctx.fillText(`${effect.req.join('')}: ${effect.type} ${effect.value}`, this.x, this.y + this.w / 2 - i * fontSize, this.w * 0.9);
+                ctx.fillText(`${effect.req.join('')}: ${effect.type} ${effect.value}`, this.x, this.y + this.w / 2 - (last- i) * fontSize*1.1, this.w * 0.9);
             } else {
-                ctx.fillText(`${effect.type} ${effect.value}`, this.x, this.y + this.w / 2 - i * fontSize, this.w * 0.9);
+                ctx.fillText(`${effect.type} ${effect.value}`, this.x, this.y + this.w / 2 - (last - i) * fontSize*1.1, this.w * 0.9);
             }
         };
 
