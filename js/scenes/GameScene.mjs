@@ -429,17 +429,21 @@ export default class GameScene {
   }
 
   drawHud(ctx) {
+    ctx.fillStyle = FRONT_COLOR;
     for (let h = 0; h < this.player.hitPoints; h++) {
-      ctx.fillStyle = FRONT_COLOR;
       ctx.fillRect(this.canvas.width * 0.10 + h * 12, this.canvas.height * 0.64, 10, 10);
     }
+    ctx.fillStyle = FRONT_COLOR;
     for (let h = 0; h < this.player.damage; h++) {
-      ctx.fillStyle = FRONT_COLOR;
       ctx.beginPath();
       ctx.ellipse(this.canvas.width * 0.9 - h * 12, this.canvas.height * 0.647, 5, 5, 0, Math.PI * 2, false);
       ctx.fill();
       ctx.closePath();
     }
+    ctx.font = `${this.canvas.width * 0.025}px "Orbitron"`;
+    ctx.fillText(`${this.player.coins} coins`, this.canvas.width * 0.1, this.canvas.height * 0.47);
+    ctx.fillText(`Monsters: ${this.currentLevel.length}`, this.canvas.width * 0.3, this.canvas.height * 0.47);
+    
 
   }
 

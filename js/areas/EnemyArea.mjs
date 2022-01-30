@@ -125,9 +125,9 @@ export default class EnemyArea extends PlayArea {
         this.cooldown++;
         if (this.cooldown >= this.trigger) {
             this.cooldown = 0;
-            if (this.enemy.length < 3 && this.source != null) {
+            if (this.enemy.length < 3 && this.source != null && this.source.length > 0) {
                 this.enemy.push(this.source.shift());
-                if (this.enemy[0]) { this.enemy[0].flipped = true; }
+                this.enemy[0].flipped = true;
                 this.updatePositions();
             }
         }
