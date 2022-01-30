@@ -25,6 +25,8 @@ export default class EnemyArea extends PlayArea {
         this.cooldown = 0;
         this.trigger = trigger;
         this.source = source;
+        this.max = max;
+        this.gap = gap;
     }
 
     draw(ctx) {
@@ -34,18 +36,24 @@ export default class EnemyArea extends PlayArea {
         ctx.fillStyle = FRONT_COLOR;
         ctx.lineWidth = 1;
         ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
-        ctx.fillText(`${this.trigger-this.cooldown} ${this.enemy.length}`, this.x, this.y);
+        //ctx.fillText(`${this.trigger-this.cooldown} ${this.enemy.length}`, this.x, this.y);
 
         if (this.enemy.length > 0) {
             this.enemy[0].draw(ctx);
-            //this.hitPoints = this.enemy[0].hitPoints;
         }
         this.cards.forEach((card, k) => {
-            card.x = this.x - (this.w - this.cards.length - 1) / 2 * k + card.w / 2;
-            card.y = this.y + card.h / 2;
+            this.fixCardPosition(k, card);
             card.draw(ctx);
         });
     }
+    fixCardPosition(k, card) {
+        const c = k % this.max;
+        const l = Math.floor(k / this.max);
+        card.flipped = false;
+        card.x = this.x - card.w/2 + c * (card.w + this.gap/2)-this.gap/4;
+        card.y = this.y + l * (card.h + this.gap) + this.gap;
+    }
+
     add(card) {
         card.flipped = false;
         this.cards.push(card);
@@ -70,12 +78,10 @@ export default class EnemyArea extends PlayArea {
         this.enemy.forEach((card, k) => {
             card.flipped = true;
             card.x = this.x;
-            card.y = this.y - card.h * 0.65;
+            card.y = this.y - card.h * 0.9;
         });
         this.cards.forEach((card, k) => {
-            card.flipped = false;
-            card.x = this.x - (this.w - this.cards.length - 1) / 2 * k + card.w / 2;
-            card.y = this.y + card.h / 2;
+            this.fixCardPosition(k, card);
         });
     }
 

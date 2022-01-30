@@ -173,7 +173,7 @@ export default class GameScene {
       {
         title: "Hand",
         x: this.canvas.width / 2,
-        y: 0.73 * this.canvas.height,
+        y: 0.735 * this.canvas.height,
         visible: true,
       }
     );
@@ -182,7 +182,7 @@ export default class GameScene {
       {
         title: "Trash",
         x: this.canvas.width / 2,
-        y: 0.9153571428571429 * this.canvas.height,
+        y: 0.925 * this.canvas.height,
         visible: false,
         w: this.canvas.width * (4 / 5),
       }
@@ -191,7 +191,7 @@ export default class GameScene {
       {
         title: "Discard",
         x: this.canvas.width / 2,
-        y: 0.9153571428571429 * this.canvas.height,
+        y: 0.925 * this.canvas.height,
         visible: false,
         w: this.canvas.width * (4 / 5),
 
@@ -201,7 +201,7 @@ export default class GameScene {
       {
         title: "Deck",
         x: this.canvas.width / 2,
-        y: 0.9153571428571429 * this.canvas.height,
+        y: 0.925 * this.canvas.height,
         visible: false,
         w: this.canvas.width * (4 / 5),
       }
@@ -211,7 +211,7 @@ export default class GameScene {
       {
         title: "Loot",
         x: this.canvas.width / 2,
-        y: 0.55 * this.canvas.height,
+        y: 0.925 * this.canvas.height,
         visible: true,
         w: this.canvas.width * (4 / 5),
       }
@@ -221,36 +221,39 @@ export default class GameScene {
       new EnemyArea(
         {
           x: 0.5 * this.canvas.width / 3,
-          y: 0.25 * this.canvas.height,
+          y: 0.315 * this.canvas.height,
           w: this.canvas.width / 3,
-          h: this.canvas.height / 3,
+          h: this.canvas.height / 2,
           type: 0,
           enemy: [],
           source: this.currentLevel,
           trigger: 5,
+          gap: this.canvas.height*0.025,
         }),
       new EnemyArea(
         {
           x: 1.5 * this.canvas.width / 3,
-          y: 0.25 * this.canvas.height,
+          y: 0.315 * this.canvas.height,
           w: this.canvas.width / 3,
-          h: this.canvas.height / 3,
+          h: this.canvas.height / 2,
           type: 0,
           enemy: [],
           source: this.currentLevel,
           trigger: 3,
+          gap: this.canvas.height*0.025,
         }
       ),
       new EnemyArea(
         {
           x: 2.5 * this.canvas.width / 3,
-          y: 0.25 * this.canvas.height,
+          y: 0.315 * this.canvas.height,
           w: this.canvas.width / 3,
-          h: this.canvas.height / 3,
+          h: this.canvas.height / 2,
           type: 0,
           enemy: [],
           source: this.currentLevel,
           trigger: 4,
+          gap: this.canvas.height*0.025,
         }),
     ];
 
@@ -327,24 +330,6 @@ export default class GameScene {
             enemyArea.add(this.playedCard);
           }
         }
-        // if (checked) {
-        //   if (!checked.deliver(this.dragging.type)) {
-        //     enemy.loseRep();
-        //     this.assets.play("thunder", false, 0.3);
-        //   }
-        //   this.assets.play("gore");
-        //   this.areas.trash.add(this.dragging);
-        //   this.areas.hand.delete(this.dragging);
-        //   if (checked.demands.length === 0) {
-        //     enemy.gainRep();
-        //     checked.effect(this);
-        //     checked.resetDemands();
-        //     enemy.sendToBottom(checked);
-        //     enemy.resetCooldown();
-        //   }
-        //   this.dragging = null;
-        //   return;
-        // }
       });
       if (this.playedCard != null) {
         this.playedCard.x = this.playedCard?.oldx;
@@ -356,19 +341,26 @@ export default class GameScene {
   click(e) {
     const [x, y] = getXY(e, this.canvas);
     if (this.newTurn.hasPoint({ x, y })) {
+      this.areas.loot.visible = true;
+      this.areas.deck.visible = false;
+      this.areas.discard.visible = false;
+      this.areas.trash.visible = false;
       this.endTurn();
     }
     if (this.showDeck.hasPoint({ x, y })) {
+      this.areas.loot.visible = !this.areas.loot.visible;
       this.areas.deck.visible = !this.areas.deck.visible;
       this.areas.discard.visible = false;
       this.areas.trash.visible = false;
     }
     if (this.showDiscard.hasPoint({ x, y })) {
+      this.areas.loot.visible = !this.areas.loot.visible;
       this.areas.deck.visible = false;
       this.areas.discard.visible = !this.areas.discard.visible;
       this.areas.trash.visible = false;
     }
     if (this.showTrash.hasPoint({ x, y })) {
+      this.areas.loot.visible = !this.areas.loot.visible;
       this.areas.deck.visible = false;
       this.areas.discard.visible = false;
       this.areas.trash.visible = !this.areas.trash.visible;
@@ -457,18 +449,19 @@ export default class GameScene {
     ctx.fillStyle = FRONT_COLOR;
     const fontSize = 0.025 * this.canvas.width;
     for (let h = 0; h < this.player.hitPoints; h++) {
-      ctx.fillRect(this.canvas.width * 0.10 + h * fontSize*1.3, this.canvas.height * 0.64, fontSize, fontSize);
+      ctx.fillRect(this.canvas.width * 0.11 + h * fontSize*1.3, this.canvas.height * 0.655, fontSize, fontSize);
     }
     ctx.fillStyle = FRONT_COLOR;
     for (let h = 0; h < this.player.damage; h++) {
       ctx.beginPath();
-      ctx.ellipse(this.canvas.width * 0.9 - h * fontSize*1.3, this.canvas.height * 0.647, fontSize/2, fontSize/2, 0, Math.PI * 2, false);
+      ctx.ellipse(this.canvas.width * 0.9 - h * fontSize*1.3 -fontSize, this.canvas.height * 0.655+fontSize/2, fontSize/2, fontSize/2, 0, Math.PI * 2, false);
       ctx.fill();
       ctx.closePath();
     }
     ctx.font = `${this.canvas.width * 0.025}px "Orbitron"`;
-    ctx.fillText(`${this.player.coins} coins`, this.canvas.width * 0.1, this.canvas.height * 0.47);
-    ctx.fillText(`Monsters: ${this.currentLevel.length}`, this.canvas.width * 0.3, this.canvas.height * 0.47);
+    ctx.textAlign = 'left';
+    ctx.fillText(`${this.player.coins} coins`, this.canvas.width * 0.11, this.canvas.height * 0.64);
+    ctx.fillText(`Monsters: ${this.currentLevel.length}`, this.canvas.width * 0.3, this.canvas.height * 0.64);
 
 
   }

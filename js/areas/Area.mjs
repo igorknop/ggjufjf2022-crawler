@@ -1,5 +1,5 @@
 import { CARD_H, CARD_W } from "../../data/AllTimeConstants.mjs";
-import { FRONT_COLOR } from "../util/Colors.mjs";
+import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 
 export default class Area {
   constructor({ title = "", x = 0, y = 0, visible = true, cards = [], max = 5, gap = 2, w = (CARD_W * 5 + 12), h = CARD_H + 12 }) {
@@ -43,6 +43,8 @@ export default class Area {
     ctx.strokeStyle = FRONT_COLOR;
     ctx.lineWidth = 1;
     ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+    ctx.fillStyle = BACKGROUND_COLOR;
+    ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
     let fontSize = 0.025 * ctx.canvas.width;
     ctx.font = `${fontSize}px "Orbitron"`;
     ctx.fillStyle = FRONT_COLOR;
