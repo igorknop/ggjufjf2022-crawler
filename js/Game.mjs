@@ -10,6 +10,10 @@ import { setCardSize } from "../data/AllTimeConstants.mjs";
 export const assets = new AssetManager();
 assets.loadAudio(`damage`, "./assets/hit.wav");
 assets.loadAudio(`click`, "./assets/click.wav");
+assets.loadAudio(`die`, "./assets/gore.mp3");
+assets.loadAudio(`right`, "./assets/right.mp3");
+assets.loadAudio(`wrong`, "./assets/wrong.mp3");
+assets.loadAudio(`heal`, "./assets/heal.wav");
 
 
 

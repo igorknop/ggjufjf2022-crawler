@@ -138,6 +138,7 @@ export default class EnemyArea extends PlayArea {
                 this.enemy[0].flipped = false;
                 scene.areas.loot.add(this.enemy.shift());
             } else {
+                scene.assets.play("heal");
                 this.enemy[0].enemy.damage = Math.max(this.enemy[0].enemy.damage - enemyTotalRegeneration, 0);
             }
         }
@@ -152,7 +153,9 @@ export default class EnemyArea extends PlayArea {
         if (scene.player.damage < scene.player.hitPoints) {
             scene.player.damage = Math.max(scene.player.damage - playerTotalRegeneration, 0);
             scene.player.stats.damageHealed += Math.max(scene.player.damage - playerTotalRegeneration, 0);
+            scene.assets.play("heal");
         } else {
+            scene.assets.play("die");
             scene.gameover = 2.0;
         }
         this.cooldown++;

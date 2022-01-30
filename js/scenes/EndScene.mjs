@@ -120,8 +120,8 @@ export default class EndScene {
     const [x, y] = getXY(e, this.canvas);
 
     if (this.newGame.hasPoint({ x, y })) {
-      this.game.assets.play("click");
       this.game.setScene("game");
+      this.game.assets.play("click");
     }
     if (this.mainMenu.hasPoint({ x, y })) {
       this.game.assets.play("click");

@@ -299,6 +299,7 @@ export default class GameScene {
 
   mousedown(e) {
     const [x, y] = getXY(e, this.canvas);
+    if (this.gameover !== null) { return; }
     this.areas.hand.cards.forEach((s) => {
       if (s.draggable && s.hasPoint({ x, y })) {
         this.playedCard = s;
@@ -309,7 +310,7 @@ export default class GameScene {
   }
   mouseup(e) {
     const [x, y] = getXY(e, this.canvas);
-    if(this.gameover !== null) {
+    if (this.gameover !== null) {
       return;
     }
     if (this.playedCard !== null) {
@@ -318,6 +319,7 @@ export default class GameScene {
       this.areas.enemies.forEach((enemyArea) => {
         // const checked = enemy.check(x, y);
         if (enemyArea.hasPoint({ x, y })) {
+          this.game.assets.play('right');
           let overAnother = false;
           for (let i = 0; i < enemyArea.cards.length; i++) {
             if (enemyArea.cards[i].hasPoint({ x, y })) {
@@ -340,13 +342,14 @@ export default class GameScene {
       if (this.playedCard != null) {
         this.playedCard.x = this.playedCard?.oldx;
         this.playedCard.y = this.playedCard?.oldy;
+        this.game.assets.play('right');
       }
       this.playedCard = null;
     }
   }
   click(e) {
     const [x, y] = getXY(e, this.canvas);
-    if(this.gameover !== null) {
+    if (this.gameover !== null) {
       return;
     }
     if (this.newTurn.hasPoint({ x, y })) {
