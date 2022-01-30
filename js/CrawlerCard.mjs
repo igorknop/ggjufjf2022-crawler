@@ -50,7 +50,7 @@ export default class CrawlerCard extends Card {
         ctx.textAlign = "center";
         ctx.font = `${fontSize}px "Orbitron"`;
         ctx.fillText(this.player.name, this.x, this.y - this.h * 0.34, this.w * 0.9);
-        ctx.fillText(this.player.set, this.x, this.y - this.h * 0.2, this.w * 0.9);
+        ctx.fillText(this.player.set.join(''), this.x, this.y - this.h * 0.2, this.w * 0.9);
         ctx.fillStyle = FRONT_COLOR;
         ctx.font = `${fontSize}px "Orbitron"`;
         for (let i = this.player.effects.length - 1; i >= 0; i--) {
