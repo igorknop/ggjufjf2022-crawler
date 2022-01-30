@@ -109,9 +109,9 @@ export default class EnemyArea extends PlayArea {
                 }
             });
             this.enemy[0].enemy.damage += Math.max(playerTotalDamage - enemyTotalDefense, 0);
-            game.player.stats.damageDealt += Math.min(playerTotalDamage - enemyTotalDefense, 0);
+            game.player.stats.damageDealt += Math.max(playerTotalDamage - enemyTotalDefense, 0);
             if (this.enemy[0].enemy.damage >= this.enemy[0].enemy.hitPoints) {
-                game.player.stats.enemiesKilled++;
+                game.player.stats.monstersKilled++;
                 this.enemy[0].enemy.damage = 0;
                 this.enemy[0].flipped = false;
                 game.areas.loot.add(this.enemy.shift());

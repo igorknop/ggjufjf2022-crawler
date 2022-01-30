@@ -306,8 +306,23 @@ export default class GameScene {
       this.areas.enemies.forEach((enemyArea) => {
         // const checked = enemy.check(x, y);
         if (enemyArea.hasPoint({ x, y })) {
-          this.areas.hand.delete(this.playedCard)
-          enemyArea.add(this.playedCard);
+          let overAnother = false;
+          for (let i = 0; i < enemyArea.cards.length; i++) {
+            if (enemyArea.cards[i].hasPoint({ x, y })) {
+              overAnother = true;
+              enemyArea.cards[i].cardsUnder.push(this.playedCard);
+              this.areas.hand.delete(this.playedCard);  
+              this.playedCard.x = enemyArea.cards[i].x;
+              this.playedCard.y = enemyArea.cards[i].y + 8 * enemyArea.cards[i].cardsUnder.length;
+              this.playedCard = null;
+              this.areas.hand.updatePositions();
+              return;
+            }
+          }
+          if (!overAnother) {
+            this.areas.hand.delete(this.playedCard)
+            enemyArea.add(this.playedCard);
+          }
         }
         // if (checked) {
         //   if (!checked.deliver(this.dragging.type)) {
@@ -407,7 +422,9 @@ export default class GameScene {
     });
     this.areas.discard.addAll(this.areas.hand);
     this.areas.enemies.forEach((enemyArea) => {
-      this.areas.discard.cards = [...this.areas.discard.cards, ...enemyArea.cards];
+      
+      this.areas.discard.cards = [...this.areas.discard.cards, ...enemyArea.cards, ...enemyArea.cards.flatMap(c=>c.cardsUnder)];
+      enemyArea.cards.forEach(c=>{c.cardsUnder = [];});
       enemyArea.cards = [];
     });
     this.areas.discard.updatePositions();
@@ -443,7 +460,7 @@ export default class GameScene {
     ctx.font = `${this.canvas.width * 0.025}px "Orbitron"`;
     ctx.fillText(`${this.player.coins} coins`, this.canvas.width * 0.1, this.canvas.height * 0.47);
     ctx.fillText(`Monsters: ${this.currentLevel.length}`, this.canvas.width * 0.3, this.canvas.height * 0.47);
-    
+
 
   }
 
@@ -451,16 +468,16 @@ export default class GameScene {
     ctx.save();
     ctx.lineWidth = 1;
     ctx.beginPath();
-    for (let r = 0; r < ctx.canvas.height; r+=6) {
-      ctx.globalAlpha = 0.1*Math.sin(r / ctx.canvas.height * Math.PI);
+    for (let r = 0; r < ctx.canvas.height; r += 6) {
+      ctx.globalAlpha = 0.1 * Math.sin(r / ctx.canvas.height * Math.PI);
       ctx.moveTo(0, r);
       ctx.strokeStyle = 'hsla(300deg, 100%, 20%, 0.1';
       ctx.lineTo(ctx.canvas.width, r);
       ctx.stroke();
     }
-    for (let c = 0; c < ctx.canvas.width; c+=6) {
-      ctx.globalAlpha = 0.1*Math.sin(c / ctx.canvas.width * Math.PI);
-      ctx.moveTo(c,0);
+    for (let c = 0; c < ctx.canvas.width; c += 6) {
+      ctx.globalAlpha = 0.1 * Math.sin(c / ctx.canvas.width * Math.PI);
+      ctx.moveTo(c, 0);
       ctx.strokeStyle = 'hsla(200deg, 100%, 10%, 0.05';
       ctx.lineTo(c, ctx.canvas.height);
       ctx.stroke();
