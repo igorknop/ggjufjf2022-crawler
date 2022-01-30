@@ -16,4 +16,24 @@ export const STARTING_STAMINA_REGEN = 2;
 
 export const EFFECT_ATTACK = 'attack';
 export const EFFECT_DEFENSE = 'defense';
-export const EFFECT_REGENERATION = 'regeneration';
+export const EFFECT_HEAL = 'heal';
+export const EFFECT_REST = 'rest';
+
+export const EFFECTS = {
+    EFFECT_ATTACK: {
+        id: 'attack',
+        name: 'Attack',
+    },
+    EFFECT_DEFENSE: {
+        id: 'defense',
+        name: 'Defense',
+    },  
+    EFFECT_HEAL: {
+        id: 'heal',
+        name: 'Heal',
+    },
+    EFFECT_REST: {
+        id: 'rest',
+        name: 'Rest',
+    },
+}

@@ -1,5 +1,5 @@
 import PlayArea from "./PlayArea.mjs";
-import { CARD_H, EFFECT_ATTACK, EFFECT_DEFENSE, EFFECT_REGENERATION } from "../../data/AllTimeConstants.mjs";
+import { CARD_H, EFFECT_ATTACK, EFFECT_DEFENSE, EFFECT_HEAL } from "../../data/AllTimeConstants.mjs";
 import { FRONT_COLOR } from "../util/Colors.mjs";
 
 export default class EnemyArea extends PlayArea {
@@ -105,7 +105,7 @@ export default class EnemyArea extends PlayArea {
                     playerTotalDamage += effect.value;
                 } else if (effect.type === EFFECT_DEFENSE) {
                     playerTotalDefense += effect.value;
-                } else if (effect.type === EFFECT_REGENERATION) {
+                } else if (effect.type === EFFECT_HEAL) {
                     playerTotalRegeneration += effect.value;
                 }
             });
@@ -117,7 +117,7 @@ export default class EnemyArea extends PlayArea {
                     enemyTotalDamage += effect.value;
                 } else if (effect.type === EFFECT_DEFENSE) {
                     enemyTotalDefense += effect.value;
-                } else if (effect.type === EFFECT_REGENERATION) {
+                } else if (effect.type === EFFECT_HEAL) {
                     enemyTotalRegeneration += effect.value;
                 }
             });
