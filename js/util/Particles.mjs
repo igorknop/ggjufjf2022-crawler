@@ -9,7 +9,8 @@ export default class ParticleManager {
     step(dt) {
         for (let i = this.particles.length-1; i >= 0; i--) {
             const particle = this.particles[i];
-            particle.vy += 300 * dt;
+            particle.vx += particle.ax * dt;
+            particle.vy += particle.ay * dt;
             particle.x += particle.vx * dt;
             particle.y += particle.vy * dt;
             particle.ttl -= 1 * dt;
@@ -22,10 +23,26 @@ export default class ParticleManager {
     explode(x, y, qty=30, ttl=0.5) {
         for (let q = 0; q < qty; q++) {
             const particle = {
+                ax: 0,
+                ay: 300,
                 x,
                 y,
                 vx: 420 * (Math.random() - 0.5),
                 vy: -420 * (Math.random() - 0.5),
+                ttl,
+            };
+            this.particles.push(particle);
+        }
+    }
+    heal(x, y, qty=30, ttl=0.5) {
+        for (let q = 0; q < qty; q++) {
+            const particle = {
+                ax: 0,
+                ay: -300,
+                x,
+                y,
+                vx:  120 * (Math.random() - 0.5),
+                vy: -420 * (Math.random() ),
                 ttl,
             };
             this.particles.push(particle);

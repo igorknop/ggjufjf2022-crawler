@@ -128,7 +128,7 @@ export default class EnemyArea extends PlayArea {
                 this.enemy[0].enemy.damage += damageInflictedToEnemy;
                 scene.player.stats.damageDealt += Math.max(playerTotalDamage - enemyTotalDefense, 0);
                 for (let p = 0; p < damageInflictedToEnemy; p++) {
-                    scene.particles.explode(this.enemy[0].x- fontSize * 1.3*p, this.enemy[0].y );
+                    scene.particles.explode(this.enemy[0].x - fontSize * 1.3 * p, this.enemy[0].y);
                     scene.assets.play("damage");
                 }
             }
@@ -138,8 +138,12 @@ export default class EnemyArea extends PlayArea {
                 this.enemy[0].flipped = false;
                 scene.areas.loot.add(this.enemy.shift());
             } else {
-                scene.assets.play("heal");
+                const totalHealed = Math.min(this.enemy[0].enemy.damage, enemyTotalRegeneration);
                 this.enemy[0].enemy.damage = Math.max(this.enemy[0].enemy.damage - enemyTotalRegeneration, 0);
+                if (totalHealed > 0) {
+                    scene.particles.heal(this.enemy[0].x - fontSize * 1.3 * p, this.enemy[0].y);
+                    scene.assets.play("heal");
+                }
             }
         }
         scene.player.stats.damageBlocked += Math.min(playerTotalDefense, enemyTotalDamage);
@@ -151,9 +155,13 @@ export default class EnemyArea extends PlayArea {
             scene.assets.play("damage");
         }
         if (scene.player.damage < scene.player.hitPoints) {
+            const totalHealed = Math.min(scene.player.damage, playerTotalRegeneration);
             scene.player.damage = Math.max(scene.player.damage - playerTotalRegeneration, 0);
-            scene.player.stats.damageHealed += Math.max(scene.player.damage - playerTotalRegeneration, 0);
-            scene.assets.play("heal");
+            scene.player.stats.damageHealed += totalHealed;
+            if (totalHealed > 0) {
+                scene.particles.heal(scene.ctx.canvas.width * 0.9 - scene.player.damage * fontSize * 1.3, scene.ctx.canvas.height * 0.655);
+                scene.assets.play("heal");
+            }
         } else {
             scene.assets.play("die");
             scene.gameover = 2.0;
