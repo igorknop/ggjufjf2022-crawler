@@ -20,6 +20,10 @@ if (ch > cw) {
     canvas.width = ch / ASPECT;
   }
 }
+canvas.width = canvas.width*3;
+canvas.height = canvas.height*3;
+canvas.style.width = canvas.width/3 + "px";
+canvas.style.height = canvas.height/3 + "px";
 
 const game = new Game(canvas);
 game.setup();
