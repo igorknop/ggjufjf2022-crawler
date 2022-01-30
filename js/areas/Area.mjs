@@ -40,6 +40,7 @@ export default class Area {
 
   draw(ctx) {
     if (!this.visible) return;
+    ctx.textAlign = "center";
     ctx.strokeStyle = FRONT_COLOR;
     ctx.lineWidth = 1;
     ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);

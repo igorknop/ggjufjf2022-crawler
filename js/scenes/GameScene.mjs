@@ -6,9 +6,7 @@ import { STARTING_CARDS_IN_HAND, GAME_TIME, STARTING_STAMINA_REGEN } from "../..
 import Ready from "../areas/Ready.mjs";
 import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
-import { shuffleArray } from "../util/shuffle.mjs";
 import generateLevel1 from "../../data/cards/Level1.mjs";
-import { CARDS_SLIMES } from "../../data/cards/CardsSlime.mjs";
 import { CARDS_GIANT_RATS } from "../../data/cards/CardsGiantRat.mjs";
 
 export default class GameScene {
@@ -24,6 +22,7 @@ export default class GameScene {
     this.animID = null;
     this.currentLevel = [];
     this.createAreas();
+    this.hint = "";
   }
   start() {
     this.assets.stopAll();
@@ -106,7 +105,6 @@ export default class GameScene {
     this.canvas.ontouchmove = (e) => {
       this.touchmove(e);
     };
-
   }
 
   step(t) {
@@ -382,12 +380,24 @@ export default class GameScene {
     });
 
   }
+
+
   mousemove(e) {
+    this.hint = "";
     const [x, y] = getXY(e, this.canvas);
     if (this.playedCard) {
       this.playedCard.x = x;
       this.playedCard.y = y;
+      this.hint = this.playedCard.player.hint;
+      return;
     }
+    this.areas.enemies.forEach(enArea => {
+      enArea.enemy.forEach(enemy => {
+      if(enemy.hasPoint({x,y})){
+        this.hint = enemy.enemy.hint??"";
+        return;
+      }});
+    });
   }
   mouseout(e) {
     if (this.playedCard) {
@@ -462,6 +472,7 @@ export default class GameScene {
     ctx.textAlign = 'left';
     ctx.fillText(`${this.player.coins} coins`, this.canvas.width * 0.11, this.canvas.height * 0.64);
     ctx.fillText(`Monsters: ${this.currentLevel.length}`, this.canvas.width * 0.3, this.canvas.height * 0.64);
+    ctx.fillText(`${this.hint}`, this.canvas.width * 0.1, this.canvas.height * 0.59, this.canvas.width*0.8);
 
 
   }
