@@ -1,17 +1,15 @@
 import Area from "../areas/Area.mjs";
 import EnemyArea from "../areas/EnemyArea.mjs";
 import Button from "../Button.mjs";
-import Card from "../Card.mjs";
 import CrawlerCard from "../CrawlerCard.mjs";
-import { ALL_AVAILABLE } from "../../data/AllCards.mjs";
 import { CARDS_IN_HAND, GAME_TIME } from "../../data/AllTimeConstants.mjs";
-import { CARDS_GIANT_RAT } from "../../data/cards/CardsGiantRat.mjs";
-import { CARDS_SLIME } from "../../data/cards/CardsSlime.mjs";
-import PlayArea from "../areas/PlayArea.mjs";
 import Ready from "../areas/Ready.mjs";
 import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
 import { shuffleArray } from "../util/shuffle.mjs";
+import generateLevel1 from "../../data/cards/Level1.mjs";
+import { CARDS_SLIMES } from "../../data/cards/CardsSlime.mjs";
+import { CARDS_GIANT_RATS } from "../../data/cards/CardsGiantRat.mjs";
 
 export default class GameScene {
   constructor(canvas, ctx) {
@@ -25,8 +23,9 @@ export default class GameScene {
     this.dt = null;
     this.areas = {};
     const touches = [];
-    this.createAreas();
     this.animID = null;
+    this.currentLevel = generateLevel1();
+    this.createAreas();
   }
   start() {
     this.assets.stopAll();
@@ -73,6 +72,8 @@ export default class GameScene {
     const touches = [];
     this.player = createPlayerData();
     this.loot = [];
+
+    this.currentLevel = generateLevel1();
 
     this.createAreas();
     this.animID = null;
@@ -124,45 +125,45 @@ export default class GameScene {
     this.areas.deck.draw(this.ctx);
     this.areas.discard.draw(this.ctx);
     this.areas.loot.draw(this.ctx);
-    
+
     this.newTurn.draw(this.ctx);
     this.showDiscard.draw(this.ctx);
     this.showDeck.draw(this.ctx);
     this.showTrash.draw(this.ctx);
-    
+
     this.expire -= Math.min(this.expire, 1 * this.dt);
     const min = padzero(Math.floor(this.expire / 60), 2);
     const seg = padzero(Math.floor(this.expire % 60), 2);
     this.ctx.font = `${this.canvas.height * 0.05}px 'Orbitron'`;
     this.ctx.textAlign = "center";
     this.ctx.fillStyle =
-    this.expire > 38
-    ? FRONT_COLOR
-    : `hsl(0deg, ${(2 - this.expire / 38) * 50}%,  ${(2 - this.expire / 38) * 50}%)`;
+      this.expire > 38
+        ? FRONT_COLOR
+        : `hsl(0deg, ${(2 - this.expire / 38) * 50}%,  ${(2 - this.expire / 38) * 50}%)`;
     this.ctx.fillText(
       `${min}:${seg}`,
       0.5 * this.canvas.width,
       0.05 * this.canvas.height
-      );
-      this.drawHud(this.ctx);
-      this.areas.hand.draw(this.ctx);
-      this.playedCard?.draw(this.ctx);
-      // if (this.areas.hand.cards.length === 0) {
-        //   this.endTurn();
-        // }
-        if (this.expire <= 0 || (this.player.damage >= this.player.hitPoints)) {
-          //cancelAnimationFrame(this.animID);
-          
-          this.game.setScene("end");
-          return;
-        }
-        this.animID = requestAnimationFrame((t) => {
-          this.step(t);
-        });
-        this.t0 = t;
-      }
-      
-      createAreas() {
+    );
+    this.drawHud(this.ctx);
+    this.areas.hand.draw(this.ctx);
+    this.playedCard?.draw(this.ctx);
+    // if (this.areas.hand.cards.length === 0) {
+    //   this.endTurn();
+    // }
+    if (this.expire <= 0 || (this.player.damage >= this.player.hitPoints)) {
+      //cancelAnimationFrame(this.animID);
+
+      this.game.setScene("end");
+      return;
+    }
+    this.animID = requestAnimationFrame((t) => {
+      this.step(t);
+    });
+    this.t0 = t;
+  }
+
+  createAreas() {
 
     this.areas.hand = new Ready(
       {
@@ -212,7 +213,7 @@ export default class GameScene {
       }
     );
 
-    this.areas.deck.loadAll(CARDS_SLIME.map((c) => new CrawlerCard(c)));
+    this.areas.deck.loadAll(CARDS_GIANT_RATS.map((c) => new CrawlerCard(c)));
     this.areas.enemies = [
       new EnemyArea(
         {
@@ -221,7 +222,9 @@ export default class GameScene {
           w: this.canvas.width / 3,
           h: this.canvas.height / 3,
           type: 0,
-          enemy: shuffleArray(CARDS_SLIME.map(c => new CrawlerCard(c))),
+          enemy: [this.currentLevel.shift()],
+          source: this.currentLevel,
+          trigger: 5,
         }),
       new EnemyArea(
         {
@@ -230,7 +233,9 @@ export default class GameScene {
           w: this.canvas.width / 3,
           h: this.canvas.height / 3,
           type: 0,
-          enemy: shuffleArray(CARDS_SLIME.map(c => new CrawlerCard(c))),
+          enemy: [this.currentLevel.shift()],
+          source: this.currentLevel,
+          trigger: 3,
         }
       ),
       new EnemyArea(
@@ -240,7 +245,9 @@ export default class GameScene {
           w: this.canvas.width / 3,
           h: this.canvas.height / 3,
           type: 0,
-          enemy: shuffleArray(CARDS_SLIME.map(c => new CrawlerCard(c))),
+          enemy: [this.currentLevel.shift()],
+          source: this.currentLevel,
+          trigger: 4,
         }),
     ];
 
@@ -434,6 +441,27 @@ export default class GameScene {
       ctx.closePath();
     }
 
+  }
+
+  drawCRTFilter(ctx) {
+    ctx.save();
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let r = 0; r < ctx.canvas.height; r+=6) {
+      ctx.globalAlpha = 0.1*Math.sin(r / ctx.canvas.height * Math.PI);
+      ctx.moveTo(0, r);
+      ctx.strokeStyle = 'hsla(300deg, 100%, 20%, 0.1';
+      ctx.lineTo(ctx.canvas.width, r);
+      ctx.stroke();
+    }
+    for (let c = 0; c < ctx.canvas.width; c+=6) {
+      ctx.globalAlpha = 0.1*Math.sin(c / ctx.canvas.width * Math.PI);
+      ctx.moveTo(c,0);
+      ctx.strokeStyle = 'hsla(200deg, 100%, 10%, 0.05';
+      ctx.lineTo(c, ctx.canvas.height);
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 }
 function padzero(num, places) {

@@ -1,9 +1,6 @@
 import PlayArea from "./PlayArea.mjs";
-import { TYPE_COLOR, FAST, CARD_H, EFFECT_ATTACK, EFFECT_DEFENSE, EFFECT_REGENERATION } from "../../data/AllTimeConstants.mjs";
-import { assets } from "../Game.mjs";
-import Sprite from "../Sprite.mjs";
-import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
-import CrawlerCard from "../CrawlerCard.mjs";
+import { CARD_H, EFFECT_ATTACK, EFFECT_DEFENSE, EFFECT_REGENERATION } from "../../data/AllTimeConstants.mjs";
+import { FRONT_COLOR } from "../util/Colors.mjs";
 
 export default class EnemyArea extends PlayArea {
     constructor({
@@ -18,12 +15,17 @@ export default class EnemyArea extends PlayArea {
         gap = 2,
         cards = [],
         enemy = [],
+        trigger = 3,
+        source = null,
     }) {
         super({ x, y, w, h, type, draggable, cards, gap, max });
         this.type = type;
         this.effect = effect;
         this.enemy = enemy;
         this.updatePositions();
+        this.cooldown = 0;
+        this.trigger = trigger;
+        this.source = source;
     }
 
     draw(ctx) {
@@ -120,5 +122,14 @@ export default class EnemyArea extends PlayArea {
         game.player.stats.damageBlocked += Math.min(playerTotalDefense, enemyTotalDamage);
         game.player.damage += Math.max(enemyTotalDamage - playerTotalDefense, 0);
         game.player.damage = Math.max(game.player.damage - playerTotalRegeneration, 0);
+        this.cooldown++;
+        if (this.cooldown >= this.trigger) {
+            this.cooldown = 0;
+            if (this.enemy.length < 3 && this.source != null) {
+                this.enemy.push(this.source.shift());
+                if (this.enemy[0]) { this.enemy[0].flipped = true; }
+                this.updatePositions();
+            }
+        }
     }
 }
