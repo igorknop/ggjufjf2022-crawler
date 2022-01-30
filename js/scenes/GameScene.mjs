@@ -32,13 +32,7 @@ export default class GameScene {
   }
   stop() {
     this.game.messages = [];
-    const totalBuildReputations =
-      4 * this.areas.buildings.reduce((a, c) => a + c.reputation - 2, 0);
-    this.game.messages.push(
-      `Character Skills:\t\t${totalBuildReputations}`
-    );
-    const totalGodReputations =
-      8 * this.areas.enemies.reduce((a, c) => a + c.reputation - 2, 0);
+  
     for (const key in this.player.stats) {
       if (Object.hasOwnProperty.call(this.player.stats, key)) {
         const value = this.player.stats[key];
@@ -46,9 +40,7 @@ export default class GameScene {
 
       }
     }
-    let total = 0;
-    total += totalBuildReputations;
-    total += totalGodReputations;
+    let total = this.player.stats.coinsGained+this.player.stats.monstersKilled;
     this.game.messages.push("");
     this.game.messages.push(`TOTAL SCORE:\t\t${total}`);
     this.game.score = total;
@@ -440,7 +432,7 @@ export default class GameScene {
 
   refillPlayerHand() {
     let cardsDrawned = 0;
-    if (this.areas.deck.size() <= this.player.staminaRegen) {
+    if (this.areas.deck.size() <= Math.min(this.player.stamina-this.areas.hand.size(), this.player.staminaRegen)) {
       cardsDrawned += this.areas.deck.size();
       this.areas.hand.addAll(this.areas.deck);
       this.areas.deck.addAll(this.areas.discard);
