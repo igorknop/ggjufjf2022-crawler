@@ -50,7 +50,7 @@ export default class EnemyArea extends PlayArea {
         const c = k % this.max;
         const l = Math.floor(k / this.max);
         card.flipped = false;
-        card.x = this.x - card.w/2 + c * (card.w + this.gap/2)-this.gap/4;
+        card.x = this.x - card.w / 2 + c * (card.w + this.gap / 2) - this.gap / 4;
         card.y = this.y + l * (card.h + this.gap) + this.gap;
     }
 
@@ -85,7 +85,7 @@ export default class EnemyArea extends PlayArea {
         });
     }
 
-    resolveEffects(game) {
+    resolveEffects(scene) {
         let enemyTotalDamage = 0;
         let enemyTotalDefense = 0;
         let enemyTotalRegeneration = 0;
@@ -94,10 +94,12 @@ export default class EnemyArea extends PlayArea {
         let playerTotalDefense = 0;
         let playerTotalRegeneration = 0;
 
+        const fontSize = 0.025 * scene.ctx.canvas.width;
+
         this.cards.forEach(card => {
             card.player.effects.forEach(effect => {
-                if(effect.req) {
-                    if(!isSuperset(new Set(card.cardsUnder.flatMap(c=>c.player.set)), new Set(effect.req))) {
+                if (effect.req) {
+                    if (!isSuperset(new Set(card.cardsUnder.flatMap(c => c.player.set)), new Set(effect.req))) {
                         return;
                     }
                 }
@@ -121,22 +123,35 @@ export default class EnemyArea extends PlayArea {
                     enemyTotalRegeneration += effect.value;
                 }
             });
-            this.enemy[0].enemy.damage += Math.max(playerTotalDamage - enemyTotalDefense, 0);
-            game.player.stats.damageDealt += Math.max(playerTotalDamage - enemyTotalDefense, 0);
+            const damageInflictedToEnemy = Math.max(playerTotalDamage - enemyTotalDefense, 0);
+            if (damageInflictedToEnemy > 0) {
+                this.enemy[0].enemy.damage += damageInflictedToEnemy;
+                scene.player.stats.damageDealt += Math.max(playerTotalDamage - enemyTotalDefense, 0);
+                for (let p = 0; p < damageInflictedToEnemy; p++) {
+                    scene.particles.explode(this.enemy[0].x- fontSize * 1.3*p, this.enemy[0].y );
+                }
+            }
             if (this.enemy[0].enemy.damage >= this.enemy[0].enemy.hitPoints) {
-                game.player.stats.monstersKilled++;
+                scene.player.stats.monstersKilled++;
                 this.enemy[0].enemy.damage = 0;
                 this.enemy[0].flipped = false;
-                game.areas.loot.add(this.enemy.shift());
+                scene.areas.loot.add(this.enemy.shift());
             } else {
                 this.enemy[0].enemy.damage = Math.max(this.enemy[0].enemy.damage - enemyTotalRegeneration, 0);
             }
         }
-        game.player.stats.damageBlocked += Math.min(playerTotalDefense, enemyTotalDamage);
-        game.player.damage += Math.max(enemyTotalDamage - playerTotalDefense, 0);
-        if(game.player.damage < game.player.hitPoints) {
-            game.player.damage = Math.max(game.player.damage - playerTotalRegeneration, 0);
-            game.player.stats.damageHealed += Math.max(game.player.damage - playerTotalRegeneration, 0);
+        scene.player.stats.damageBlocked += Math.min(playerTotalDefense, enemyTotalDamage);
+        const damageInflictedToPlayer = Math.max(enemyTotalDamage - playerTotalDefense, 0);
+
+        scene.player.damage += damageInflictedToPlayer;
+        if (damageInflictedToPlayer > 0) {
+            scene.particles.explode(scene.ctx.canvas.width * 0.9 - scene.player.damage * fontSize * 1.3, scene.ctx.canvas.height * 0.655);
+        }
+        if (scene.player.damage < scene.player.hitPoints) {
+            scene.player.damage = Math.max(scene.player.damage - playerTotalRegeneration, 0);
+            scene.player.stats.damageHealed += Math.max(scene.player.damage - playerTotalRegeneration, 0);
+        } else {
+            scene.gameover = 2.0;
         }
         this.cooldown++;
         if (this.cooldown >= this.trigger) {

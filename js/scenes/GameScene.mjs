@@ -8,11 +8,13 @@ import { BACKGROUND_COLOR, FRONT_COLOR } from "../util/Colors.mjs";
 import getXY from "../util/getXY.mjs";
 import generateLevel1 from "../../data/cards/Level1.mjs";
 import { CARDS_GIANT_RATS } from "../../data/cards/CardsGiantRat.mjs";
+import ParticleManager from "../util/Particles.mjs";
 
 export default class GameScene {
   constructor(canvas, ctx) {
     this.canvas = canvas;
     this.ctx = ctx;
+    this.gameover = null;
     this.player = createPlayerData();
     this.playedCard = null;
     this.t0 = null;
@@ -23,6 +25,7 @@ export default class GameScene {
     this.currentLevel = [];
     this.createAreas();
     this.hint = "";
+    this.particles = new ParticleManager(ctx);
   }
   start() {
     this.assets.stopAll();
@@ -32,7 +35,7 @@ export default class GameScene {
   }
   stop() {
     this.game.messages = [];
-  
+
     for (const key in this.player.stats) {
       if (Object.hasOwnProperty.call(this.player.stats, key)) {
         const value = this.player.stats[key];
@@ -40,7 +43,7 @@ export default class GameScene {
 
       }
     }
-    let total = this.player.stats.coinsGained+this.player.stats.monstersKilled;
+    let total = this.player.stats.coinsGained + this.player.stats.monstersKilled;
     this.game.messages.push("");
     this.game.messages.push(`TOTAL SCORE:\t\t${total}`);
     this.game.score = total;
@@ -53,6 +56,7 @@ export default class GameScene {
   }
 
   setup() {
+    this.gameover = null;
     this.expire = GAME_TIME;
     this.playedCard = null;
     this.t0 = null;
@@ -142,15 +146,24 @@ export default class GameScene {
     this.drawHud(this.ctx);
     this.areas.hand.draw(this.ctx);
     this.playedCard?.draw(this.ctx);
+
+    this.particles.step(this.dt);
+    this.particles.draw();
+
     // if (this.areas.hand.cards.length === 0) {
     //   this.endTurn();
     // }
+    if (this.gameover !== null) {
+      this.gameover -= this.dt;
+    }
     if (this.expire <= 0 || (this.player.damage >= this.player.hitPoints)) {
       //cancelAnimationFrame(this.animID);
-
-      this.game.setScene("end");
-      return;
+      if (this.gameover <= 0.0) {
+        this.game.setScene("end");
+        return;
+      }
     }
+
     this.animID = requestAnimationFrame((t) => {
       this.step(t);
     });
@@ -218,7 +231,7 @@ export default class GameScene {
           enemy: [],
           source: this.currentLevel,
           trigger: 5,
-          gap: this.canvas.height*0.025,
+          gap: this.canvas.height * 0.025,
         }),
       new EnemyArea(
         {
@@ -230,7 +243,7 @@ export default class GameScene {
           enemy: [],
           source: this.currentLevel,
           trigger: 3,
-          gap: this.canvas.height*0.025,
+          gap: this.canvas.height * 0.025,
         }
       ),
       new EnemyArea(
@@ -243,7 +256,7 @@ export default class GameScene {
           enemy: [],
           source: this.currentLevel,
           trigger: 4,
-          gap: this.canvas.height*0.025,
+          gap: this.canvas.height * 0.025,
         }),
     ];
 
@@ -296,6 +309,9 @@ export default class GameScene {
   }
   mouseup(e) {
     const [x, y] = getXY(e, this.canvas);
+    if(this.gameover !== null) {
+      return;
+    }
     if (this.playedCard !== null) {
       this.playedCard.x = x;
       this.playedCard.y = y;
@@ -330,6 +346,9 @@ export default class GameScene {
   }
   click(e) {
     const [x, y] = getXY(e, this.canvas);
+    if(this.gameover !== null) {
+      return;
+    }
     if (this.newTurn.hasPoint({ x, y })) {
       this.areas.loot.visible = true;
       this.areas.deck.visible = false;
@@ -385,10 +404,11 @@ export default class GameScene {
     }
     this.areas.enemies.forEach(enArea => {
       enArea.enemy.forEach(enemy => {
-      if(enemy.hasPoint({x,y})){
-        this.hint = enemy.enemy.hint??"";
-        return;
-      }});
+        if (enemy.hasPoint({ x, y })) {
+          this.hint = enemy.enemy.hint ?? "";
+          return;
+        }
+      });
     });
   }
   mouseout(e) {
@@ -432,13 +452,13 @@ export default class GameScene {
 
   refillPlayerHand() {
     let cardsDrawned = 0;
-    if (this.areas.deck.size() <= Math.min(this.player.stamina-this.areas.hand.size(), this.player.staminaRegen)) {
+    if (this.areas.deck.size() <= Math.min(this.player.stamina - this.areas.hand.size(), this.player.staminaRegen)) {
       cardsDrawned += this.areas.deck.size();
       this.areas.hand.addAll(this.areas.deck);
       this.areas.deck.addAll(this.areas.discard);
     }
 
-    while (this.areas.deck.size()>0 && cardsDrawned < this.player.staminaRegen && this.areas.hand.size() < this.player.stamina) {
+    while (this.areas.deck.size() > 0 && cardsDrawned < this.player.staminaRegen && this.areas.hand.size() < this.player.stamina) {
       const r = Math.floor(Math.random() * this.areas.deck.size());
       const p = this.areas.deck.cards[r];
       this.areas.hand.add(p);
@@ -451,12 +471,12 @@ export default class GameScene {
     ctx.fillStyle = FRONT_COLOR;
     const fontSize = 0.025 * this.canvas.width;
     for (let h = 0; h < this.player.hitPoints; h++) {
-      ctx.fillRect(this.canvas.width * 0.11 + h * fontSize*1.3, this.canvas.height * 0.655, fontSize, fontSize);
+      ctx.fillRect(this.canvas.width * 0.11 + h * fontSize * 1.3, this.canvas.height * 0.655, fontSize, fontSize);
     }
     ctx.fillStyle = FRONT_COLOR;
     for (let h = 0; h < this.player.damage; h++) {
       ctx.beginPath();
-      ctx.ellipse(this.canvas.width * 0.9 - h * fontSize*1.3 -fontSize, this.canvas.height * 0.655+fontSize/2, fontSize/2, fontSize/2, 0, Math.PI * 2, false);
+      ctx.ellipse(this.canvas.width * 0.9 - h * fontSize * 1.3 - fontSize, this.canvas.height * 0.655 + fontSize / 2, fontSize / 2, fontSize / 2, 0, Math.PI * 2, false);
       ctx.fill();
       ctx.closePath();
     }
@@ -464,7 +484,7 @@ export default class GameScene {
     ctx.textAlign = 'left';
     ctx.fillText(`${this.player.coins} coins`, this.canvas.width * 0.11, this.canvas.height * 0.64);
     ctx.fillText(`Monsters: ${this.currentLevel.length}`, this.canvas.width * 0.3, this.canvas.height * 0.64);
-    ctx.fillText(`${this.hint}`, this.canvas.width * 0.1, this.canvas.height * 0.59, this.canvas.width*0.8);
+    ctx.fillText(`${this.hint}`, this.canvas.width * 0.1, this.canvas.height * 0.59, this.canvas.width * 0.8);
 
 
   }
