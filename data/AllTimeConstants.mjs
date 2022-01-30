@@ -1,7 +1,7 @@
 import { BACKGROUND_COLOR } from "../js/util/Colors.mjs";
 
 
-export const GAME_TIME = 180;
+export const GAME_TIME = 5*60;
 
 export const TYPE_COLOR = {};
 export let CARD_W = 0;
