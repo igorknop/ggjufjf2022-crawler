@@ -37,3 +37,58 @@ export const EFFECTS = {
         name: 'Rest',
     },
 }
+
+export const SLOTS = {
+    HEAD: {
+        id: 'head',
+        name: 'Head',
+    },
+    GLOVES: {
+        id: 'gloves',
+        name: 'gloves',
+    },  
+    FEET: {
+        id: 'feet',
+        name: 'Feet',
+    },
+    CHEST: {
+        id: 'chest',
+        name: 'Chest',
+    },
+    LEGS: {
+        id: 'legs',
+        name: 'Legs',
+    },
+    WAIST: {
+        id: 'waist',
+        name: 'Waist',
+    },
+    HAND_MAIN: {
+        id: 'main-hand',
+        name: 'Main Hand',
+    },
+    HAND_OFF: {
+        id: 'main-off',
+        name: 'Off Hand',
+    },
+    SHIELD: {
+        id: 'shield',
+        name: 'Shield',
+    },
+    CAPE: {
+        id: 'cape',
+        name: 'Cape',
+    },
+    RING_LEFT: {
+        id: 'ring-left',
+        name: 'Ring Left',
+    },
+    RING_RIGHT: {
+        id: 'ring',
+        name: 'Ring Right',
+    },
+    NECK: {
+        id: 'neck',
+        name: 'Neck',
+    },
+}
