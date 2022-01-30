@@ -77,12 +77,12 @@ export default class RulesScene {
     fontSize = 0.01901428571428571 * this.canvas.height;
     this.ctx.font = `${fontSize}px 'Orbitron'`;
     this.ctx.textAlign ='left';
-    let text = `You was thrown in the dungeon and must escape before the time goes by.`;
+    let text = `You were thrown in the dungeon and must escape before time goes by.`;
     writeText(this.ctx, text, 0.1*this.canvas.width, 0.39*this.canvas.height, 0.8*this.canvas.width, fontSize*2);   
-    text = `Drag the cards to the enemies to fight them. Whom receives an amount ot tokens equals to their hitpoints, die.`;
+    text = `Drag the cards to the enemies to fight them. Who receives many tokens equal to their hit points, die.`;
     writeText(this.ctx, text, 0.1*this.canvas.width, 0.49*this.canvas.height, 0.8*this.canvas.width, fontSize*2);   
 
-    text = `Dead monsters go to loot pile as an item. You can choose a single card to add to your deck. Others will turn into gold coins.`;
+    text = `Dead monsters go to the loot pile as an item. You can choose a single card to add to your deck, and the others will turn into gold coins.`;
     writeText(this.ctx, text, 0.1*this.canvas.width, 0.62*this.canvas.height, 0.8*this.canvas.width, fontSize*2);   
 
     text = `Use other cards as resources to boost strong effects.`;
