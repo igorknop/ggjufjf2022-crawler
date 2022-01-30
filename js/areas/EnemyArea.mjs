@@ -128,13 +128,16 @@ export default class EnemyArea extends PlayArea {
                 this.enemy[0].enemy.damage = 0;
                 this.enemy[0].flipped = false;
                 game.areas.loot.add(this.enemy.shift());
-                return;
+            } else {
+                this.enemy[0].enemy.damage = Math.max(this.enemy[0].enemy.damage - enemyTotalRegeneration, 0);
             }
-            this.enemy[0].enemy.damage = Math.max(this.enemy[0].enemy.damage - enemyTotalRegeneration, 0);
         }
         game.player.stats.damageBlocked += Math.min(playerTotalDefense, enemyTotalDamage);
         game.player.damage += Math.max(enemyTotalDamage - playerTotalDefense, 0);
-        game.player.damage = Math.max(game.player.damage - playerTotalRegeneration, 0);
+        if(game.player.damage < game.player.hitPoints) {
+            game.player.damage = Math.max(game.player.damage - playerTotalRegeneration, 0);
+            game.player.stats.damageHealed += Math.max(game.player.damage - playerTotalRegeneration, 0);
+        }
         this.cooldown++;
         if (this.cooldown >= this.trigger) {
             this.cooldown = 0;

@@ -516,6 +516,7 @@ function createPlayerData() {
       damageTaken: 0,
       damageBlocked: 0,
       damageDealt: 0,
+      damageHealed: 0,
       level: 1,
       coinsGained: 0,
       coinsSpent: 0,
